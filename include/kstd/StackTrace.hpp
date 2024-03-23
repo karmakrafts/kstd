@@ -72,6 +72,6 @@ namespace kstd {
         KSTD_DEFAULT_MOVE_COPY(StackTrace, StackTrace)
         ~StackTrace() noexcept = default;
 
-        [[nodiscard]] static auto get_current() noexcept -> StackTrace;
+        [[nodiscard]] static auto get_current(usize depth = 32) noexcept -> StackTrace;
     };
 }// namespace kstd
