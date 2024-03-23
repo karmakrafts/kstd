@@ -1,4 +1,4 @@
-// Copyright 2024 LMNL
+// Copyright 2024 Karma Krafts & associates
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -14,7 +14,7 @@
 #include <gtest/gtest.h>
 #include <kstd/FixedArray.hpp>
 
-TEST(lstd_FixedArray, fixed_array_of) {
+TEST(kstd_FixedArray, fixed_array_of) {
     using namespace kstd;
 
     constexpr auto values = fixed_array_of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
@@ -26,7 +26,7 @@ TEST(lstd_FixedArray, fixed_array_of) {
     }
 }
 
-TEST(lstd_FixedArray, fixed_array_of_template) {
+TEST(kstd_FixedArray, fixed_array_of_template) {
     using namespace kstd;
 
     constexpr auto values = fixed_array_of<1, 2, 3, 4, 5, 6, 7, 8, 9, 10>();

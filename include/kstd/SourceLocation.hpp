@@ -44,7 +44,7 @@ namespace kstd {
         KSTD_DEFAULT_MOVE_COPY(SourceLocation, SourceLocation, constexpr)
         ~SourceLocation() noexcept = default;
 
-        static auto current(const char* file = __builtin_FILE(),
+        static auto get_current(const char* file = __builtin_FILE(),
                             const char* function = __builtin_FUNCTION(),
                             const usize line = __builtin_LINE(),
                             const usize column = KSTD_COLUMN) noexcept -> SourceLocation {

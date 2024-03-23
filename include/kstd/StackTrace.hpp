@@ -21,7 +21,8 @@
 
 namespace kstd {
     class StackTraceElement final {
-        String _executable;
+        void* _address;
+        String _binary;
         String _file_name;
         String _function_name;
         usize _line {};
@@ -32,16 +33,21 @@ namespace kstd {
         KSTD_DEFAULT_MOVE_COPY(StackTraceElement, StackTraceElement)
         ~StackTraceElement() noexcept = default;
 
-        StackTraceElement(String executable, String file_name, String function_name, const usize line, const usize column) noexcept
-            : _executable(kstd::move(executable))
+        StackTraceElement(void* address, String binary, String file_name, String function_name, const usize line, const usize column) noexcept
+            : _address(address)
+            , _binary(kstd::move(binary))
             , _file_name(kstd::move(file_name))
             , _function_name(kstd::move(function_name))
             , _line(line)
             , _column(column) {
         }
 
-        [[nodiscard]] auto get_executable() const noexcept -> const String& {
-            return _executable;
+        [[nodiscard]] auto get_address() const noexcept -> void* {
+            return _address;
+        }
+
+        [[nodiscard]] auto get_binary() const noexcept -> const String& {
+            return _binary;
         }
 
         [[nodiscard]] auto get_file_name() const noexcept -> const String& {
@@ -71,6 +77,14 @@ namespace kstd {
     public:
         KSTD_DEFAULT_MOVE_COPY(StackTrace, StackTrace)
         ~StackTrace() noexcept = default;
+
+        [[nodiscard]] auto operator [](usize index) const noexcept -> const StackTraceElement& {
+            return _elements[index];
+        }
+
+        [[nodiscard]] auto get_depth() const noexcept -> usize {
+            return _elements.size();
+        }
 
         [[nodiscard]] static auto get_current(usize depth = 32) noexcept -> StackTrace;
     };
