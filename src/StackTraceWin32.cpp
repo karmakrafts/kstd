@@ -11,11 +11,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#ifdef KSTD_PLATFORM_WINDOWS
+
+#include "kstd/Atomic.hpp"
 #include "kstd/StackTrace.hpp"
 #include <DbgEng.h>
 #include <DbgHelp.h>
 
 namespace kstd {
+    static atomic_bool initialized { false };
     static HMODULE dbgeng = nullptr;
     static IDebugClient* debug_client = nullptr;
     static IDebugSymbols* debug_symbols = nullptr;
@@ -72,4 +76,11 @@ namespace kstd {
             //TODO: handle error
         }
     }
+
+    auto StackTrace::get_current(usize depth) noexcept -> StackTrace {
+        //const auto num_frames = CaptureStackBackTrace(0, static_cast<DWORD>(depth), )
+    }
+
 }
+
+#endif
