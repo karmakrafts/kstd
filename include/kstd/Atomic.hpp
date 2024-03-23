@@ -13,10 +13,24 @@
 
 #pragma once
 
-#include <vector>
+#include <atomic>
+
+#include "Types.hpp"
 
 namespace kstd {
-    // TODO: replace this
+    // TODO: Replace these
     template<typename T>
-    using Array = std::vector<T>;
+    using Atomic = std::atomic<T>;
+
+    using atomic_i8 = Atomic<i8>;
+    using atomic_i16 = Atomic<i16>;
+    using atomic_i32 = Atomic<i32>;
+    using atomic_i64 = Atomic<i64>;
+
+    using atomic_u8 = Atomic<u8>;
+    using atomic_u16 = Atomic<u16>;
+    using atomic_u32 = Atomic<u32>;
+    using atomic_u64 = Atomic<u64>;
+
+    using atomic_bool = Atomic<bool>;
 }// namespace kstd

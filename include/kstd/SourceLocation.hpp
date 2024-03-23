@@ -69,4 +69,4 @@ namespace kstd {
     };
 }// namespace kstd
 
-#define KSTD_LOCATION const kstd::SourceLocation& __loc = kstd::SourceLocation::current()
+#define KSTD_LOCATION const kstd::SourceLocation& __loc = kstd::SourceLocation::get_current()

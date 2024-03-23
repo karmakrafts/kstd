@@ -13,10 +13,9 @@
 
 #pragma once
 
-#include <vector>
+#include <string>
 
 namespace kstd {
-    // TODO: replace this
-    template<typename T>
-    using Array = std::vector<T>;
-}// namespace kstd
+    // TODO: Replace these..
+    using String = std::string;
+}
