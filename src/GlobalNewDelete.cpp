@@ -14,30 +14,13 @@
 #ifdef KSTD_GLOBAL_MIMALLOC
 
 #include <mimalloc.h>
-#include <new>
 
 // NOLINTBEGIN
 void* operator new(const size_t size) {
     return mi_malloc(size);
 }
 
-void* operator new[](const size_t size) {
-    return mi_malloc(size);
-}
-
-void* operator new(const size_t size, std::align_val_t alignment) {
-    return mi_malloc_aligned(size, static_cast<size_t>(alignment));
-}
-
-void* operator new[](const size_t size, std::align_val_t alignment) {
-    return mi_malloc_aligned(size, static_cast<size_t>(alignment));
-}
-
 void operator delete(void* memory) {
-    mi_free(memory);
-}
-
-void operator delete[](void* memory) {
     mi_free(memory);
 }
 // NOLINTEND

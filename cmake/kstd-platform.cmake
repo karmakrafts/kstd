@@ -89,21 +89,9 @@ else ()
     message(FATAL_ERROR "Unsupported target platform '${CMAKE_SYSTEM_NAME}'")
 endif ()
 
-# Check if we are building a debug binary;
-#   - If we are on GNU/Linux, enable debug symbols & safe STL
-#   - If we are on Windows set the appropriate iterator debug level
-
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(KSTD_BUILD_TYPE "debug")
     set(KSTD_BUILD_DEBUG ON)
-    if(KSTD_PLATFORM_LINUX AND COMPILER_GCC)
-        # Enable safe STL, disable inlining and optimizations
-        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g3 -O0 -fno-inline -D_GLIBCXX_DEBUG_BACKTRACE")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g3 -O0 -fno-inline -D_GLIBCXX_DEBUG_BACKTRACE")
-    endif()
-    if(KSTD_PLATFORM_WINDOWS AND KSTD_COMPILER_MSVC)
-        add_compile_definitions(_ITERATOR_DEBUG_LEVEL=1) # Enable checked iterators
-    endif()
 else ()
     set(KSTD_BUILD_RELEASE ON)
     set(KSTD_BUILD_TYPE "release")

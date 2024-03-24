@@ -38,6 +38,11 @@ namespace kstd {
     using DWARFObject = Dwarf_Debug_s;
     using DWARFAttribute = Dwarf_Attribute_s;
     using DWARFError = Dwarf_Error_s;
+    using DWARFHalf = Dwarf_Half;
+    using DWARFSigned = Dwarf_Signed;
+    using DWARFUnsigned = Dwarf_Unsigned;
+    using DWARFBool = Dwarf_Bool;
+    using DWARFOff = Dwarf_Off;
 
     [[nodiscard]] inline auto demangle(const String& name) noexcept -> String {
         int status;
@@ -59,7 +64,7 @@ namespace kstd {
     }
 
     [[nodiscard]] inline auto get_attrib(DWARFDie* die, const u16 attribute) noexcept -> DWARFAttribute* {
-        i32 has_attrib = 0;
+        DWARFBool has_attrib = 0;
         DWARFError* error = nullptr;
         if(dwarf_hasattr(die, attribute, &has_attrib, &error) != DW_DLV_OK || !has_attrib) {
             return nullptr;
@@ -71,14 +76,15 @@ namespace kstd {
         return attrib;
     }
 
-    template<typename T, decltype(auto) TFormer, Dwarf_Half... TForms>
-    requires(IsCallable<decltype(TFormer), DWARFAttribute*, T*, Dwarf_Error*>)
-    [[nodiscard]] auto get_attrib_value(DWARFObject* object, DWARFDie* die, const u16 attribute) noexcept -> Tuple<Dwarf_Attribute, T> {
+    template<typename T, decltype(auto) TFormer, DWARFHalf... TForms>
+    requires(IsCallable<decltype(TFormer), DWARFAttribute*, T*, DWARFError**>)
+    [[nodiscard]] auto get_attrib_value(DWARFObject* object, DWARFDie* die, const DWARFHalf attribute) noexcept
+        -> Tuple<DWARFAttribute*, T> {
         auto* attrib = get_attrib(die, attribute);
         if(attrib == nullptr) {
             return {nullptr, {}};
         }
-        u16 form;
+        DWARFHalf form;
         DWARFError* error = nullptr;
         if(dwarf_whatform(attrib, &form, &error) != DW_DLV_OK || ((form != TForms) && ...)) {
             dwarf_dealloc(object, attrib, DW_DLA_ATTR);
@@ -100,7 +106,7 @@ namespace kstd {
                                         const Array<String>& file_names) noexcept -> void {
         // Extract source file name
         const auto [file_attrib, file_index] =
-            get_attrib_value<Dwarf_Unsigned, &dwarf_formudata, DW_FORM_udata, DW_FORM_sdata, DW_FORM_implicit_const, DW_FORM_data1,
+            get_attrib_value<DWARFUnsigned, &dwarf_formudata, DW_FORM_udata, DW_FORM_sdata, DW_FORM_implicit_const, DW_FORM_data1,
                              DW_FORM_data2, DW_FORM_data4, DW_FORM_data8, DW_FORM_data16>(object, die, DW_AT_decl_file);
         if(file_attrib != nullptr) {
             file_name = file_names[file_index];
@@ -108,7 +114,7 @@ namespace kstd {
         }
         // Extract line number
         const auto [line_attrib, line_no] =
-            get_attrib_value<Dwarf_Unsigned, &dwarf_formudata, DW_FORM_udata, DW_FORM_sdata, DW_FORM_implicit_const, DW_FORM_data1,
+            get_attrib_value<DWARFUnsigned, &dwarf_formudata, DW_FORM_udata, DW_FORM_sdata, DW_FORM_implicit_const, DW_FORM_data1,
                              DW_FORM_data2, DW_FORM_data4, DW_FORM_data8, DW_FORM_data16>(object, die, DW_AT_decl_line);
         if(line_attrib != nullptr) {
             line = line_no;
@@ -116,7 +122,7 @@ namespace kstd {
         }
         // Extract column number
         const auto [column_attrib, column_no] =
-            get_attrib_value<Dwarf_Unsigned, &dwarf_formudata, DW_FORM_udata, DW_FORM_sdata, DW_FORM_implicit_const, DW_FORM_data1,
+            get_attrib_value<DWARFUnsigned, &dwarf_formudata, DW_FORM_udata, DW_FORM_sdata, DW_FORM_implicit_const, DW_FORM_data1,
                              DW_FORM_data2, DW_FORM_data4, DW_FORM_data8, DW_FORM_data16>(object, die, DW_AT_decl_column);
         if(column_attrib != nullptr) {
             column = column_no;
@@ -134,7 +140,7 @@ namespace kstd {
                                           const Array<String>& file_names) noexcept -> bool {// NOLINT
         DWARFError* error = nullptr;
         // Check if our current DIE is a subprogram aka. function
-        u16 tag;
+        DWARFHalf tag;
         if(dwarf_tag(die, &tag, &error) == DW_DLV_OK && tag == DW_TAG_subprogram) {
             char* name;
             if(dwarf_diename(die, &name, &error) != DW_DLV_OK || name == nullptr) {
@@ -158,7 +164,7 @@ namespace kstd {
             }
             return false;
         }
-        // Check if we have any children and if we do, iterate over them recursively
+        // Check if we have any children and if we do, add them to the queue before we return
         DWARFDie* child_die = nullptr;
         if(dwarf_child(die, &child_die, &error) == DW_DLV_OK && child_die != nullptr) {
             do {
@@ -177,17 +183,16 @@ namespace kstd {
             return {"", 0, 0};
         }
         // Iterate through compilation units
-        usize cu_header_length;
-        u16 cu_header_version;
-        usize cu_abbrev_offset;
-        u16 cu_address_size;
-        usize cu_next_header_offset;
+        DWARFUnsigned cu_header_length;
+        DWARFHalf cu_header_version;
+        DWARFOff cu_abbrev_offset;
+        DWARFHalf cu_address_size;
+        DWARFUnsigned cu_next_header_offset;
         String file_name {};
         usize line = 0;
         usize column = 0;
-        while(dwarf_next_cu_header(object, reinterpret_cast<Dwarf_Unsigned*>(&cu_header_length), &cu_header_version,
-                                   reinterpret_cast<Dwarf_Unsigned*>(&cu_abbrev_offset), &cu_address_size,
-                                   reinterpret_cast<Dwarf_Unsigned*>(&cu_next_header_offset), &error) == DW_DLV_OK) {
+        while(dwarf_next_cu_header(object, &cu_header_length, &cu_header_version, &cu_abbrev_offset, &cu_address_size,
+                                   &cu_next_header_offset, &error) == DW_DLV_OK) {
             // Retrieve compilation unit root DIE
             DWARFDie* die;
             if(dwarf_siblingof(object, nullptr, &die, &error) != DW_DLV_OK || die == nullptr) {
@@ -196,9 +201,8 @@ namespace kstd {
             // Extract source file name table
             Array<String> source_files {};
             char** file_names = nullptr;
-            isize num_file_names = 0;
-            if(dwarf_srcfiles(die, &file_names, reinterpret_cast<Dwarf_Signed*>(&num_file_names), &error) == DW_DLV_OK &&
-               file_names != nullptr) {
+            DWARFSigned num_file_names = 0;
+            if(dwarf_srcfiles(die, &file_names, &num_file_names, &error) == DW_DLV_OK && file_names != nullptr) {
                 source_files.reserve(num_file_names);
                 for(usize i = 0; i < num_file_names; ++i) {
                     source_files.emplace_back(file_names[i]);
