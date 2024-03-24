@@ -26,8 +26,8 @@ namespace kstd {
     using FalseType = ConstantType<false>;
 
     template<typename T>
-    [[noreturn]] [[nodiscard]] constexpr T&& DeclVal(KSTD_LOCATION) noexcept {
-        KSTD_PANIC("DeclVal result may not be used at runtime");
+    [[noreturn]] [[nodiscard]] constexpr T&& declval(KSTD_LOCATION) noexcept {
+        KSTD_PANIC("declval result may not be used at runtime");
     }
 
     // RemoveRef
@@ -63,19 +63,19 @@ namespace kstd {
     template<typename T>
     using RemovePtr = typename RemovePtrImpl<T>::type;
 
-    // VoidType
+    // Void
     template<typename...>
-    struct MakeVoid {
+    struct VoidImpl {
         using type = void;
     };
 
     template<typename... TTypes>
-    using VoidType = typename MakeVoid<TTypes...>::type;
+    using Void = typename VoidImpl<TTypes...>::type;
 
     // IsDirectConstructible
     template<typename T, typename... TArgs>
     struct IsDirectConstructibleImpl {
-        template<typename U, decltype(U {DeclVal<TArgs>()...})* = nullptr>
+        template<typename U, decltype(U {declval<TArgs>()...})* = nullptr>
         static char test(int);
 
         template<typename U>
@@ -157,7 +157,7 @@ namespace kstd {
     struct IsCompleteImpl : FalseType {};
 
     template<typename T>
-    struct IsCompleteImpl<T, VoidType<decltype(sizeof(T) != 0)>> : TrueType {};
+    struct IsCompleteImpl<T, Void<decltype(sizeof(T) != 0)>> : TrueType {};
 
     template<typename T>
     constexpr bool IsComplete = IsCompleteImpl<T>::value;
@@ -167,7 +167,7 @@ namespace kstd {
     struct IsAssignableImpl : FalseType {};
 
     template<typename TLeft, typename TRight>
-    struct IsAssignableImpl<TLeft, TRight, VoidType<decltype(DeclVal<TLeft>() = DeclVal<TRight>())>> : TrueType {};
+    struct IsAssignableImpl<TLeft, TRight, Void<decltype(declval<TLeft>() = declval<TRight>())>> : TrueType {};
 
     template<typename TLeft, typename TRight>
     constexpr bool IsAssignable = IsAssignableImpl<TLeft, TRight>::value;
@@ -177,7 +177,7 @@ namespace kstd {
     struct IsConvertibleImpl : FalseType {};
 
     template<typename TTo, typename TFrom>
-    struct IsConvertibleImpl<TTo, TFrom, VoidType<decltype((TTo*) DeclVal<TFrom*>())>> : TrueType {};
+    struct IsConvertibleImpl<TTo, TFrom, Void<decltype((TTo*) declval<TFrom*>())>> : TrueType {};
 
     template<typename TTo, typename TFrom>
     constexpr bool IsConvertible = IsConvertibleImpl<TTo, TFrom>::value;

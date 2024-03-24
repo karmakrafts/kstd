@@ -71,6 +71,6 @@ IndentRequiresClause: false
 AlignEscapedNewlines: Left
 BreakConstructorInitializersBeforeComma: true
 BinPackParameters: false
-BinPackArguments: false
+BinPackArguments: true
 EmptyLineAfterAccessModifier: Never
 EmptyLineBeforeAccessModifier: Always

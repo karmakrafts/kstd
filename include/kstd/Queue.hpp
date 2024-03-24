@@ -13,10 +13,9 @@
 
 #pragma once
 
-#include <fmt/format.h>
-#include <string>
+#include <queue>
 
 namespace kstd {
-    // TODO: Replace these..
-    using String = std::string;
-}// namespace kstd
+    template<typename T>
+    using Queue = std::queue<T>;
+}

@@ -13,10 +13,12 @@
 
 #pragma once
 
-#include <fmt/format.h>
-#include <string>
+#include <tuple>
 
 namespace kstd {
-    // TODO: Replace these..
-    using String = std::string;
-}// namespace kstd
+    template<typename... TTypes>
+    using Tuple = std::tuple<TTypes...>;
+
+    using std::get;
+    using std::make_tuple;
+}

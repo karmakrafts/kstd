@@ -13,6 +13,8 @@
 
 #pragma once
 
+#ifdef KSTD_STACKTRACE
+
 #include "Array.hpp"
 #include "Defaults.hpp"
 #include "String.hpp"
@@ -21,7 +23,7 @@
 
 namespace kstd {
     class StackTraceElement final {
-        void* _address;
+        void* _address {};
         String _binary;
         String _file_name;
         String _function_name;
@@ -33,7 +35,12 @@ namespace kstd {
         KSTD_DEFAULT_MOVE_COPY(StackTraceElement, StackTraceElement)
         ~StackTraceElement() noexcept = default;
 
-        StackTraceElement(void* address, String binary, String file_name, String function_name, const usize line, const usize column) noexcept
+        StackTraceElement(void* address,
+                          String binary,
+                          String file_name,
+                          String function_name,
+                          const usize line,
+                          const usize column) noexcept
             : _address(address)
             , _binary(kstd::move(binary))
             , _file_name(kstd::move(file_name))
@@ -70,6 +77,8 @@ namespace kstd {
     class StackTrace final {
         Array<StackTraceElement> _elements;
 
+        StackTrace() noexcept = default;
+
         explicit StackTrace(Array<StackTraceElement> elements) noexcept
             : _elements(kstd::move(elements)) {
         }
@@ -78,7 +87,7 @@ namespace kstd {
         KSTD_DEFAULT_MOVE_COPY(StackTrace, StackTrace)
         ~StackTrace() noexcept = default;
 
-        [[nodiscard]] auto operator [](usize index) const noexcept -> const StackTraceElement& {
+        [[nodiscard]] auto operator[](const usize index) const noexcept -> const StackTraceElement& {
             return _elements[index];
         }
 
@@ -86,6 +95,8 @@ namespace kstd {
             return _elements.size();
         }
 
-        [[nodiscard]] static auto get_current(usize depth = 32) noexcept -> StackTrace;
+        [[nodiscard]] static auto get_current(usize depth = 32, usize skip = 1) noexcept -> StackTrace;
     };
 }// namespace kstd
+
+#endif// KSTD_STACKTRACE

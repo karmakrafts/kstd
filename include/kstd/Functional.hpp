@@ -10,3 +10,19 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
+#pragma once
+
+#include "Meta.hpp"
+#include "ParameterPack.hpp"
+
+namespace kstd {
+    template<typename, typename, typename = void>
+    struct IsCallableImpl : FalseType {};
+
+    template<typename T, typename... TArgs>
+    struct IsCallableImpl<T, Pack<TArgs...>, Void<decltype(declval<T&&>()(declval<TArgs&&>()...))>> : TrueType {};
+
+    template<typename T, typename... TArgs>
+    constexpr bool IsCallable = IsCallableImpl<T, Pack<TArgs...>>::value;
+}// namespace kstd

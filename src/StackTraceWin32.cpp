@@ -11,12 +11,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifdef KSTD_PLATFORM_WINDOWS
+#ifdef defined(KSTD_STACKTRACE) && defined(KSTD_PLATFORM_WINDOWS)
 
-#include "kstd/Atomic.hpp"
 #include "kstd/StackTrace.hpp"
+
 #include <DbgEng.h>
 #include <DbgHelp.h>
+
+#include "kstd/Atomic.hpp"
 
 namespace kstd {
     static atomic_bool initialized {false};
@@ -25,44 +27,44 @@ namespace kstd {
     static IDebugSymbols* debug_symbols = nullptr;
     static IDebugControl* debug_control = nullptr;
 
-    void ensure_init() {
+    [[nodiscard]] inline auto ensure_init() -> bool {
         if(initialized) {
             return;
         }
 
         dbgeng = LoadLibraryExW(L"dbgeng.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32);
         if(!dbgeng) {
-            //TODO: handle error
+            return false;
         }
 
         const auto debug_create = reinterpret_cast<decltype(&DebugCreate)>(GetProcAddress(dbgeng, "DebugCreate"));
         if(!debug_create) {
-            //TODO: handle error
+            return false;
         }
 
         auto result = debug_create(IID_IDebugClient, reinterpret_cast<void**>(&debug_client));
         if(FAILED(result)) {
-            //TODO: handle error
+            return false;
         }
 
         result = debug_client->QueryInterface(IID_IDebugSymbols, reinterpret_cast<void**>(&debug_symbols));
         if(FAILED(result)) {
-            //TODO: handle error
+            return false;
         }
 
         result = debug_client->QueryInterface(IID_IDebugControl, reinterpret_cast<void**>(&debug_control));
         if(FAILED(result)) {
-            //TODO: handle error
+            return false;
         }
 
         result = debug_client->AttachProcess(0, GetCurrentProcessId(), DEBUG_ATTACH_NONINVASIVE | DEBUG_ATTACH_NONINVASIVE_NO_SUSPEND);
         if(FAILED(result)) {
-            //TODO: handle error
+            return false;
         }
 
         result = debug_control->WaitForEvent(0, INFINITE);
         if(FAILED(result)) {
-            //TODO: handle error
+            return false;
         }
 
         constexpr auto add_options = SYMOPT_CASE_INSENSITIVE | SYMOPT_UNDNAME | SYMOPT_DEFERRED_LOADS | SYMOPT_LOAD_LINES |
@@ -73,22 +75,24 @@ namespace kstd {
 
         result = debug_symbols->AddSymbolOptions(add_options);
         if(FAILED(result)) {
-            //TODO: handle error
+            return false;
         }
 
         result = debug_symbols->RemoveSymbolOptions(remove_options);
         if(FAILED(result)) {
-            //TODO: handle error
+            return false;
         }
 
-        initialized = true;
+        return initialized = true;
     }
 
-    auto StackTrace::get_current(usize depth) noexcept -> StackTrace {
-        ensure_init();
+    auto StackTrace::get_current(const usize depth, const usize skip) noexcept -> StackTrace {
+        if(!ensure_init()) {
+            return StackTrace {};
+        }
 
         Array<void*> backtrace(depth);
-        const auto num_frames = static_cast<usize>(CaptureStackBackTrace(1, static_cast<DWORD>(depth), backtrace.data(), nullptr));
+        const auto num_frames = static_cast<usize>(CaptureStackBackTrace(static_cast<ULONG>(skip), static_cast<DWORD>(depth), backtrace.data(), nullptr));
 
         Array<StackTraceElement> stack_frames(num_frames);
         for(usize i = 0; i < num_frames; i++) {
