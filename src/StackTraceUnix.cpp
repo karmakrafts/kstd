@@ -11,7 +11,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#if defined(KSTD_STACKTRACE) && defined(KSTD_PLATFORM_UNIX)
+#ifdef KSTD_PLATFORM_UNIX
 
 #include "kstd/StackTrace.hpp"
 
@@ -58,7 +58,7 @@ namespace kstd {
     [[nodiscard]] inline auto get_binary(const void* address) noexcept -> String {
         Dl_info symbol_info;
         if(dladdr(address, &symbol_info) > 0 && symbol_info.dli_fname) {
-            return symbol_info.dli_fname;
+            return String(symbol_info.dli_fname);
         }
         return "";
     }
@@ -263,12 +263,12 @@ namespace kstd {
                 continue;
             }
             unw_word_t offset;
-            if(unw_get_proc_name(&cursor, name_buffer.get_data(), MAX_NAME_SIZE, &offset) != UNW_ESUCCESS) {
+            if(unw_get_proc_name(&cursor, name_buffer.data(), MAX_NAME_SIZE, &offset) != UNW_ESUCCESS) {
                 stack_frames.emplace_back();
                 continue;
             }
 
-            const String mangled_name(name_buffer.get_const_data());
+            const String mangled_name(name_buffer.data());
             auto function_name = demangle(mangled_name);
             auto binary = get_binary(ip);
             auto source_info = get_source_info(binary, mangled_name);
@@ -277,7 +277,7 @@ namespace kstd {
             ++index;
         }
 
-        return StackTrace(kstd::move(stack_frames));
+        return StackTrace(move(stack_frames));
     }
 }// namespace kstd
 

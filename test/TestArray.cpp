@@ -13,9 +13,36 @@
 
 #include <gtest/gtest.h>
 #include <kstd/Array.hpp>
-#include <kstd/StackTrace.hpp>
+#include <kstd/StringView.hpp>
 
-TEST(kstd_Array, PushBack) {
+TEST(kstd_Array, array_of) {
     using namespace kstd;
-    Array<usize> values{};
+    auto values = array_of(0, 1, 2, 3, 4, 5, 6, 7, 8, 9);
+    static_assert(is_same<typename decltype(values)::element_type, i32>);
+    ASSERT_EQ(values.size(), 10);
+}
+
+TEST(kstd_Array, push_back) {
+    using namespace kstd;
+    Array<usize> values {};
+}
+
+TEST(kstd_Array, pop_back) {
+    using namespace kstd;
+    Array<usize> values {};
+}
+
+TEST(kstd_Array, emplace_back) {
+    using namespace kstd;
+    Array<usize> values {};
+}
+
+TEST(kstd_Array, back) {
+    using namespace kstd;
+    Array<usize> values {};
+}
+
+TEST(kstd_Array, front) {
+    using namespace kstd;
+    Array<usize> values {};
 }

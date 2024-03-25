@@ -11,7 +11,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifdef defined(KSTD_STACKTRACE) && defined(KSTD_PLATFORM_WINDOWS)
+#ifdef KSTD_PLATFORM_WINDOWS
 
 #include "kstd/StackTrace.hpp"
 

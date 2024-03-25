@@ -13,8 +13,6 @@
 
 #pragma once
 
-#ifdef KSTD_STACKTRACE
-
 #include "Array.hpp"
 #include "Defaults.hpp"
 #include "String.hpp"
@@ -89,19 +87,27 @@ namespace kstd {
         }
 
     public:
+        using const_iterator = typename decltype(_elements)::const_iterator;
+
         KSTD_DEFAULT_MOVE_COPY(StackTrace, StackTrace)
         ~StackTrace() noexcept = default;
+
+        [[nodiscard]] auto cbegin() const noexcept -> const_iterator {
+            return _elements.cbegin();
+        }
+
+        [[nodiscard]] auto cend() const noexcept -> const_iterator {
+            return _elements.cend();
+        }
 
         [[nodiscard]] auto operator[](const usize index) const noexcept -> const StackTraceElement& {
             return _elements[index];
         }
 
         [[nodiscard]] auto get_depth() const noexcept -> usize {
-            return _elements.get_size();
+            return _elements.size();
         }
 
         [[nodiscard]] static auto get_current(usize depth = 32, usize skip = 1) noexcept -> StackTrace;
     };
 }// namespace kstd
-
-#endif// KSTD_STACKTRACE

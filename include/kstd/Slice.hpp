@@ -21,15 +21,16 @@ namespace kstd {
     template<typename T>
     struct Slice final {
         using value_type = T;
+        using const_iterator = const value_type*;
 
     private:
         using self_type = Slice<value_type>;
 
-        const value_type* const _data;
+        const T* const _data;
         usize _size;
 
     public:
-        Slice(const value_type* data, const usize size) noexcept
+        Slice(const T* data, const usize size) noexcept
             : _data(data)
             , _size(size) {
         }
@@ -37,15 +38,23 @@ namespace kstd {
         KSTD_DEFAULT_MOVE_COPY(Slice, self_type, inline)
         ~Slice() noexcept = default;
 
-        [[nodiscard]] auto get_size() const noexcept -> usize {
-            return _size;
-        }
-
-        [[nodiscard]] auto get_data() noexcept -> value_type* {
+        [[nodiscard]] auto begin() const noexcept -> const_iterator {
             return _data;
         }
 
-        [[nodiscard]] auto get_const_data() const noexcept -> const value_type* {
+        [[nodiscard]] auto end() const noexcept -> const_iterator {
+            return _data + _size;
+        }
+
+        [[nodiscard]] auto size() const noexcept -> usize {
+            return _size;
+        }
+
+        [[nodiscard]] auto data() noexcept -> T* {
+            return _data;
+        }
+
+        [[nodiscard]] auto data() const noexcept -> const T* {
             return _data;
         }
 
@@ -54,11 +63,11 @@ namespace kstd {
         }
 
         auto copy_to(T* dst, const usize size) const noexcept -> void {
-            ::memcpy(dst, _data, sizeof(T) * size);
+            memcpy(dst, _data, sizeof(T) * size);
         }
 
         auto copy_to_unsafe(void* dst, const usize size) const noexcept -> void {
-            ::memcpy(dst, _data, size);
+            memcpy(dst, _data, size);
         }
     };
 }// namespace kstd

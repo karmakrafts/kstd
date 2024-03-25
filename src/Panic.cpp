@@ -11,8 +11,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#pragma once
+#include "kstd/Panic.hpp"
+
+// NOLINTBEGIN
+#include <stdio.h>
+#include <stdlib.h>
+// NOLINTEND
+
+#include "kstd/StackTrace.hpp"
 
 namespace kstd {
-    [[noreturn]] auto panic(const char* message) noexcept -> void;
+    auto panic(const char* message) noexcept -> void {
+        const auto trace = StackTrace::get_current(100, 2);
+        exit(1);
+    }
 }// namespace kstd

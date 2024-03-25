@@ -13,6 +13,11 @@
 
 #pragma once
 
-namespace kstd {
-    [[noreturn]] auto panic(const char* message) noexcept -> void;
-}// namespace kstd
+#include "Types.hpp"
+
+namespace kstd::streams {
+    template<typename T>
+    struct Stream final {
+        using value_type = T;
+    };
+}

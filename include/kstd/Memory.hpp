@@ -13,21 +13,27 @@
 
 #pragma once
 
-#include "Meta.hpp"
+#include "Types.hpp"
+#include "System.hpp"
 
 namespace kstd {
     template<typename T>
-    [[nodiscard]] constexpr remove_ref<T>&& move(T&& value) noexcept {
-        return static_cast<remove_ref<T>&&>(value);
+    constexpr void copy(T* dst, const T* src, const usize size) noexcept {
+        memcpy(dst, src, size);
+    }
+
+    template<typename T, usize TDstSize, usize TSrcSize>
+    constexpr void copy(T(&dst)[TDstSize], const T(&src)[TSrcSize], const usize size) noexcept {
+
     }
 
     template<typename T>
-    [[nodiscard]] constexpr T&& forward(remove_ref<T>& value) noexcept {
-        return static_cast<T&&>(value);
+    [[nodiscard]] constexpr T* dangling() noexcept {
+        return reinterpret_cast<T*>(-1);
     }
 
     template<typename T>
-    [[nodiscard]] constexpr T&& forward(remove_ref<T>&& value) noexcept {
-        return static_cast<T&&>(value);
+    [[nodiscard]] constexpr T* align(T* pointer, const usize alignment) noexcept {
+        return reinterpret_cast<T*>((reinterpret_cast<usize>(pointer) + alignment - 1) & ~alignment);
     }
-}// namespace kstd
+}

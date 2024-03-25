@@ -13,9 +13,28 @@
 
 #pragma once
 
-#include "StringView.hpp"
+#include "FixedArray.hpp"
 #include "Types.hpp"
 
 namespace kstd {
-    using WStringView = BasicStringView<wchar_t>;
+    template<typename T>
+    struct MaybeUninit final {
+        using value_type = T;
+
+    private:
+        FixedArray<u8, sizeof(T)> alignas(T) _data;
+
+    public:
+        constexpr MaybeUninit() noexcept = default;
+        KSTD_DEFAULT_MOVE_COPY(MaybeUninit, MaybeUninit, constexpr);
+        ~MaybeUninit() noexcept = default;
+
+        [[nodiscard]] operator T&() noexcept {
+            return *reinterpret_cast<T*>(_data.data());
+        }
+
+        [[nodiscard]] operator const T&() const noexcept {
+            return *reinterpret_cast<const T*>(_data.data());
+        }
+    };
 }// namespace kstd

@@ -11,5 +11,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <gtest/gtest.h>
-#include <kstd/WStringView.hpp>
+#pragma once
+
+namespace kstd {
+    template<typename T>
+    struct Option final {
+        using value_type = T;
+    };
+}

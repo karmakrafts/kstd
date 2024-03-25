@@ -30,4 +30,10 @@ namespace kstd::concepts {
 
     template<typename T>
     concept Float = is_floating_point<T>;
+
+    template<typename TAs, typename T>
+    concept AssignableAs = is_assignable<T, TAs>;
+
+    template<typename TTo, typename T>
+    concept ConvertibleTo = is_convertible<TTo, T>;
 }// namespace kstd

@@ -15,8 +15,6 @@
 
 // NOLINTBEGIN
 #include <malloc.h>
-#include <stddef.h>
-#include <stdlib.h>
 #include <string.h>
 #include <wchar.h>
 // NOLINTEND
@@ -24,6 +22,12 @@
 #include "Concepts.hpp"
 #include "Types.hpp"
 #include "Utility.hpp"
+
+#ifdef KSTD_COMPILER_MSVC
+#define KSTD_ALLOCA(s) _alloca(s)
+#else
+#define KSTD_ALLOCA(s) __builtin_alloca(s)
+#endif
 
 namespace kstd::system {
     namespace iob {

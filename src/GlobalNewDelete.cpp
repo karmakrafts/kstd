@@ -13,16 +13,6 @@
 
 #ifdef KSTD_GLOBAL_MIMALLOC
 
-#include <mimalloc.h>
-
-// NOLINTBEGIN
-void* operator new(const size_t size) {
-    return mi_malloc(size);
-}
-
-void operator delete(void* memory) {
-    mi_free(memory);
-}
-// NOLINTEND
+#include <mimalloc-new-delete.h>
 
 #endif//KSTD_GLOBAL_MIMALLOC

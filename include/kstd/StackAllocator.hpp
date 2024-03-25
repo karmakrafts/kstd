@@ -36,22 +36,22 @@ namespace kstd {
 
         [[nodiscard]] auto is_address_in_range(const void* address) const noexcept -> bool {
             const auto* byte_address = static_cast<const u8*>(address);
-            const auto* base_address = reinterpret_cast<const u8*>(_buffer.get_const_data());
-            const auto* last_address = base_address + _buffer.get_size() * size;
+            const auto* base_address = reinterpret_cast<const u8*>(_buffer.cdata());
+            const auto* last_address = base_address + _buffer.size() * size;
             return byte_address >= base_address && byte_address <= last_address;
         }
 
     public:
         StackAllocator() noexcept
-            : _head(_buffer.get_data()) {
+            : _head(_buffer.data()) {
         }
 
         KSTD_DEFAULT_MOVE_COPY(StackAllocator, StackAllocator)
         ~StackAllocator() noexcept = default;
 
         [[nodiscard]] auto allocate(const usize count) noexcept -> T* {
-            const auto offset = reinterpret_cast<usize>(_head) - reinterpret_cast<usize>(_buffer.get_const_data());
-            if(offset == _buffer.get_size()) {
+            const auto offset = reinterpret_cast<usize>(_head) - reinterpret_cast<usize>(_buffer.cdata());
+            if(offset == _buffer.size()) {
                 return fallback_allocator_type().allocate(count);
             }
             auto* memory = _head;
@@ -70,9 +70,9 @@ namespace kstd {
             const auto old_size = old_count * size;
             if(auto* old_address = _head - old_size; reinterpret_cast<u8*>(memory) == old_address) {
                 const auto offset = (count * size) - old_size;
-                const auto new_size = reinterpret_cast<usize>(_head + offset) - reinterpret_cast<usize>(_buffer.get_const_data());
+                const auto new_size = reinterpret_cast<usize>(_head + offset) - reinterpret_cast<usize>(_buffer.cdata());
                 const auto new_count = new_size / size;
-                if(new_count <= _buffer.get_size()) {
+                if(new_count <= _buffer.size()) {
                     _head += offset;
                     return old_address;
                 }

@@ -25,34 +25,17 @@ namespace kstd {
     struct FixedArray final {
         using element_type = T;
         using slice_type = Slice<element_type>;
-        static constexpr usize size = TSize;
+        static constexpr usize buffer_size = TSize;
 
     private:
-        element_type _data[size];
-
-        template<usize TIndex, element_type THead, element_type... TTail>
-        constexpr auto set_all_impl() noexcept -> void {
-            _data[TIndex] = THead;
-            if constexpr(sizeof...(TTail) > 0) {
-                set_all_impl<TIndex + 1, TTail...>();
-            }
-        }
-
-        template<usize TIndex, typename THead, typename... TTail>
-        requires(is_convertible<T, THead>)
-        constexpr auto set_all_impl(THead&& head, TTail&&... tail) noexcept -> void {
-            _data[TIndex] = head;
-            if constexpr(sizeof...(tail) > 0) {
-                set_all_impl<TIndex + 1, TTail...>(forward<TTail>(tail)...);
-            }
-        }
+        element_type _data[buffer_size];
 
         template<typename THead, typename... TTail>
         requires(is_convertible<T, THead>)
-        constexpr auto set_all_impl(const usize offset, THead&& head, TTail&&... tail) noexcept -> void {
+        constexpr auto insert_all_impl(const usize offset, THead&& head, TTail&&... tail) noexcept -> void {
             _data[offset] = head;
             if constexpr(sizeof...(tail) > 0) {
-                set_all_impl<TTail...>(offset + 1, forward<TTail>(tail)...);
+                insert_all_impl<TTail...>(offset + 1, forward<TTail>(tail)...);
             }
         }
 
@@ -61,42 +44,34 @@ namespace kstd {
         KSTD_DEFAULT_MOVE_COPY(FixedArray, FixedArray, constexpr)
         ~FixedArray() noexcept = default;
 
-        // NOLINTBEGIN
         FixedArray(const slice_type& slice) noexcept {
-            slice.copy_to(_data, min(slice.get_size(), size));
+            slice.copy_to(_data, min(slice.size(), size));
         }
 
         operator slice_type() const noexcept {
-            return {_data, size};
-        }
-
-        // NOLINTEND
-
-        template<usize TOffset, element_type... TValues>
-        constexpr auto set_all() noexcept -> void {
-            set_all_impl<TOffset, TValues...>();
-        }
-
-        template<usize TOffset, typename... TArgs>
-        constexpr auto set_all(TArgs&&... values) noexcept -> void {
-            set_all_impl<TOffset, TArgs...>(forward<TArgs>(values)...);
+            return {_data, buffer_size};
         }
 
         template<typename... TArgs>
-        constexpr auto set_all(const usize offset, TArgs&&... values) noexcept -> void {
-            set_all_impl<TArgs...>(offset, forward<TArgs>(values)...);
+        constexpr auto insert_all(TArgs&&... values) noexcept -> void {
+            insert_all_impl<TArgs...>(0, forward<TArgs>(values)...);
         }
 
-        [[nodiscard]] auto get_data() noexcept -> element_type* {
+        template<typename... TArgs>
+        constexpr auto insert_all_at(const usize index, TArgs&&... values) noexcept -> void {
+            insert_all_impl<TArgs...>(index, forward<TArgs>(values)...);
+        }
+
+        [[nodiscard]] auto data() noexcept -> element_type* {
             return _data;
         }
 
-        [[nodiscard]] auto get_const_data() const noexcept -> const element_type* {
+        [[nodiscard]] auto data() const noexcept -> const element_type* {
             return _data;
         }
 
-        [[nodiscard]] constexpr auto get_size() const noexcept -> usize {
-            return size;
+        [[nodiscard]] constexpr auto size() const noexcept -> usize {
+            return buffer_size;
         }
 
         [[nodiscard]] constexpr auto operator[](const usize index) noexcept -> element_type& {
@@ -108,19 +83,11 @@ namespace kstd {
         }
     };
 
-    template<decltype(auto)... TValues, typename T = PackElement<0, decltype(TValues)...>>
-    requires(are_convertible<T, decltype(TValues)...>)
-    [[nodiscard]] constexpr auto fixed_array_of() noexcept -> FixedArray<T, sizeof...(TValues)> {
-        FixedArray<T, sizeof...(TValues)> array {};
-        array.template set_all<0, TValues...>();
-        return array;
-    }
-
     template<typename... TArgs, typename T = PackElement<0, TArgs...>>
-    requires(are_convertible<T, TArgs...>)
+    requires(are_assignable<T, TArgs...>)
     [[nodiscard]] constexpr auto fixed_array_of(TArgs&&... args) noexcept -> FixedArray<T, sizeof...(TArgs)> {
         FixedArray<T, sizeof...(TArgs)> array {};
-        array.template set_all<0>(forward<TArgs>(args)...);
+        array.insert_all(forward<TArgs>(args)...);
         return array;
     }
 }// namespace kstd
