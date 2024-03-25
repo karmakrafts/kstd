@@ -20,7 +20,7 @@
 #include "Utility.hpp"
 
 namespace kstd {
-    template<typename T, concepts::Allocator TAllocator = Allocator<T>>
+    template<typename T, concepts::Allocator<T> TAllocator = Allocator<T>>
     struct Array final {
         using element_type = T;
         using allocator_type = TAllocator;
