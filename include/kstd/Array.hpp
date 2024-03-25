@@ -72,7 +72,7 @@ namespace kstd {
             new(_data) T();
         }
 
-        Array(const usize size, const T& default_value) noexcept
+        Array(const usize size, const T& default_value = {}) noexcept
             : _allocator()
             , _size(size)
             , _capacity(_size)
@@ -80,10 +80,6 @@ namespace kstd {
             for(usize i = 0; i < size; ++i) {
                 _data[i] = default_value;
             }
-        }
-
-        explicit Array(const usize size) noexcept
-            : Array(size, {}) {
         }
 
         Array(const self_type& other) noexcept
