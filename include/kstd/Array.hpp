@@ -150,7 +150,7 @@ namespace kstd {
         auto insert(const usize index, const T& value) noexcept -> void {
             reserve(_size + 1);
 
-            for(usize i = _size - 1; i >= index; ++i) {
+            for(isize i = _size - 1; i >= index; --i) {
                 new(&_data[i + 1]) T(move(_data[i]));
             }
 
