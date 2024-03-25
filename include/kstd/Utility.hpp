@@ -22,17 +22,17 @@ namespace kstd {
     }
 
     template<typename T>
-    [[nodiscard]] constexpr RemoveRef<T>&& move(T&& value) noexcept {
-        return static_cast<RemoveRef<T>&&>(value);
+    [[nodiscard]] constexpr remove_ref<T>&& move(T&& value) noexcept {
+        return static_cast<remove_ref<T>&&>(value);
     }
 
     template<typename T>
-    [[nodiscard]] constexpr T&& forward(RemoveRef<T>& value) noexcept {
+    [[nodiscard]] constexpr T&& forward(remove_ref<T>& value) noexcept {
         return static_cast<T&&>(value);
     }
 
     template<typename T>
-    [[nodiscard]] constexpr T&& forward(RemoveRef<T>&& value) noexcept {
+    [[nodiscard]] constexpr T&& forward(remove_ref<T>&& value) noexcept {
         return static_cast<T&&>(value);
     }
 }// namespace kstd

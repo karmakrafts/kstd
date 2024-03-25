@@ -105,12 +105,12 @@ namespace kstd::system {
     }
 
     // Strings
-    template<IntegralType T>
+    template<concepts::Integer T>
     [[nodiscard]] usize get_string_length(const T* str) noexcept {
-        if constexpr(IsSame<T, char>) {
+        if constexpr(is_same<T, char>) {
             return ::strlen(str);
         }
-        else if constexpr(IsSame<T, wchar_t>) {
+        else if constexpr(is_same<T, wchar_t>) {
             return ::wcslen(str);
         }
         else {
@@ -122,12 +122,12 @@ namespace kstd::system {
         }
     }
 
-    template<IntegralType T>
+    template<concepts::Integer T>
     void copy_string(T* dst, const T* src) noexcept {
-        if constexpr(IsSame<T, char>) {
+        if constexpr(is_same<T, char>) {
             ::strcpy(dst, src);
         }
-        else if constexpr(IsSame<T, wchar_t>) {
+        else if constexpr(is_same<T, wchar_t>) {
             ::wcscpy(dst, src);
         }
         else {
@@ -138,12 +138,12 @@ namespace kstd::system {
         }
     }
 
-    template<IntegralType T>
+    template<concepts::Integer T>
     [[nodiscard]] i32 compare_string(const T* lhs, const T* rhs) noexcept {
-        if constexpr(IsSame<T, char>) {
+        if constexpr(is_same<T, char>) {
             return ::strcmp(lhs, rhs);
         }
-        else if constexpr(IsSame<T, wchar_t>) {
+        else if constexpr(is_same<T, wchar_t>) {
             return ::wcscmp(lhs, rhs);
         }
         else {
@@ -158,12 +158,12 @@ namespace kstd::system {
         }
     }
 
-    template<IntegralType T>
+    template<concepts::Integer T>
     T* concat_string(T* dst, const T* src) noexcept {
-        if constexpr(IsSame<T, char>) {
+        if constexpr(is_same<T, char>) {
             return ::strcat(dst, src);
         }
-        else if constexpr(IsSame<T, wchar_t>) {
+        else if constexpr(is_same<T, wchar_t>) {
             return ::wcscat(dst, src);
         }
         else {

@@ -13,7 +13,6 @@
 
 #pragma once
 
-#include "Panic.hpp"
 #include "Types.hpp"
 
 namespace kstd {
@@ -26,55 +25,72 @@ namespace kstd {
     using FalseType = ConstantType<false>;
 
     template<typename T>
-    [[noreturn]] [[nodiscard]] constexpr T&& declval(KSTD_LOCATION) noexcept {
-        KSTD_PANIC("declval result may not be used at runtime");
+    [[noreturn]] [[nodiscard]] constexpr T&& declval() noexcept {
+        throw;
     }
 
     // RemoveRef
     template<typename T>
-    struct RemoveRefImpl {
+    struct RemoveRef {
         using type = T;
     };
 
     template<typename T>
-    struct RemoveRefImpl<T&> {
+    struct RemoveRef<T&> {
         using type = T;
     };
 
     template<typename T>
-    struct RemoveRefImpl<T&&> {
+    struct RemoveRef<T&&> {
         using type = T;
     };
 
     template<typename T>
-    using RemoveRef = typename RemoveRefImpl<T>::type;
+    using remove_ref = typename RemoveRef<T>::type;
 
     // RemovePtr
     template<typename T>
-    struct RemovePtrImpl {
+    struct RemovePtr {
         using type = T;
     };
 
     template<typename T>
-    struct RemovePtrImpl<T*> {
+    struct RemovePtr<T*> {
         using type = T;
     };
 
     template<typename T>
-    using RemovePtr = typename RemovePtrImpl<T>::type;
+    using remove_ptr = typename RemovePtr<T>::type;
+
+    // Conditional
+    template<bool, typename, typename>
+    struct Conditional;
+
+    template<typename TTrue, typename TFalse>
+    struct Conditional<true, TTrue, TFalse> {
+        using type = TTrue;
+    };
+
+    template<typename TTrue, typename TFalse>
+    struct Conditional<false, TTrue, TFalse> {
+        using type = TFalse;
+    };
+
+    template<bool TCondition, typename TTrue, typename TFalse>
+    using conditional = typename Conditional<TCondition, TTrue, TFalse>::type;
 
     // Void
     template<typename...>
-    struct VoidImpl {
+    struct ToVoid {
         using type = void;
     };
 
     template<typename... TTypes>
-    using Void = typename VoidImpl<TTypes...>::type;
+    using to_void = typename ToVoid<TTypes...>::type;
 
     // IsDirectConstructible
     template<typename T, typename... TArgs>
-    struct IsDirectConstructibleImpl {
+    struct IsDirectConstructible {
         template<typename U, decltype(U {declval<TArgs>()...})* = nullptr>
         static char test(int);
 
@@ -85,136 +101,154 @@ namespace kstd {
     };
 
     template<typename T, typename... TArgs>
-    constexpr bool IsDirectConstructible = IsDirectConstructibleImpl<T, TArgs...>::value;
+    constexpr bool is_direct_constructible = IsDirectConstructible<T, TArgs...>::value;
 
     // EnableIf
     template<bool, typename = void>
-    struct EnableIfImpl {};
+    struct EnableIf {};
 
     template<typename T>
-    struct EnableIfImpl<true, T> {
+    struct EnableIf<true, T> {
         using type = T;
     };
 
     template<bool TCondition, typename T = void>
-    using EnableIf = typename EnableIfImpl<TCondition, T>::type;
+    using enable_if = typename EnableIf<TCondition, T>::type;
 
     // RemoveConst
     template<typename T, typename = void>
-    struct RemoveConstImpl {
+    struct RemoveConst {
         using type = T;
     };
 
     template<typename T>
-    struct RemoveConstImpl<T, const T> {
+    struct RemoveConst<const T> {
         using type = T;
     };
 
     template<typename T>
-    using RemoveConst = typename RemoveConstImpl<T>::type;
+    struct RemoveConst<const T*> {
+        using type = T*;
+    };
+
+    template<typename T>
+    struct RemoveConst<const T&> {
+        using type = T&;
+    };
+
+    template<typename T>
+    using remove_const = typename RemoveConst<T>::type;
 
     // IsSame
     template<typename, typename>
-    struct IsSameImpl : FalseType {};
+    struct IsSame : FalseType {};
 
     template<typename T>
-    struct IsSameImpl<T, T> : TrueType {};
+    struct IsSame<T, T> : TrueType {};
 
     template<typename TFirst, typename TSecond>
-    constexpr bool IsSame = IsSameImpl<TFirst, TSecond>::value;
+    constexpr bool is_same = IsSame<TFirst, TSecond>::value;
 
     // Decay
     template<typename T>
-    struct DecayImpl {
+    struct Decay {
         using type = T;
     };
 
     template<typename T>
-    struct DecayImpl<T const> {
-        using type = typename DecayImpl<T>::type;
+    struct Decay<T const> {
+        using type = typename Decay<T>::type;
     };
 
     template<typename T>
-    struct DecayImpl<T*> {
-        using type = typename DecayImpl<T>::type;
+    struct Decay<T*> {
+        using type = typename Decay<T>::type;
     };
 
     template<typename T>
-    struct DecayImpl<T&> {
-        using type = typename DecayImpl<T>::type;
+    struct Decay<T&> {
+        using type = typename Decay<T>::type;
     };
 
     template<typename T>
-    struct DecayImpl<T&&> {
-        using type = typename DecayImpl<T>::type;
+    struct Decay<T&&> {
+        using type = typename Decay<T>::type;
     };
 
-    template<typename Type>
-    using Decay = typename DecayImpl<Type>::type;
+    template<typename T>
+    using decay = typename Decay<T>::type;
 
     // IsComplete
     template<typename, typename = void>
-    struct IsCompleteImpl : FalseType {};
+    struct IsComplete : FalseType {};
 
     template<typename T>
-    struct IsCompleteImpl<T, Void<decltype(sizeof(T) != 0)>> : TrueType {};
+    struct IsComplete<T, to_void<decltype(sizeof(T) != 0)>> : TrueType {};
 
     template<typename T>
-    constexpr bool IsComplete = IsCompleteImpl<T>::value;
+    constexpr bool is_complete = IsComplete<T>::value;
 
     // IsAssignable
     template<typename, typename, typename = void>
-    struct IsAssignableImpl : FalseType {};
+    struct IsAssignable : FalseType {};
 
     template<typename TLeft, typename TRight>
-    struct IsAssignableImpl<TLeft, TRight, Void<decltype(declval<TLeft>() = declval<TRight>())>> : TrueType {};
+    struct IsAssignable<TLeft, TRight, to_void<decltype(declval<TLeft&>() = declval<TRight&&>())>> : TrueType {};
 
     template<typename TLeft, typename TRight>
-    constexpr bool IsAssignable = IsAssignableImpl<TLeft, TRight>::value;
+    constexpr bool is_assignable = IsAssignable<TLeft, TRight>::value;
 
     // IsConvertible
-    template<typename, typename, typename = void>
-    struct IsConvertibleImpl : FalseType {};
+    template<typename TTo, typename TFrom>
+    struct IsConvertible {
+        template<typename T, typename F>
+        static auto test(T) -> decltype(static_cast<T>(declval<F>()), TrueType{});
+
+        template<typename, typename>
+        static auto test(...) -> FalseType;
+
+        static constexpr bool value = decltype(test<TTo, TFrom>(0))::value;
+    };
+
+    template<>
+    struct IsConvertible<void, void> : TrueType {};
 
     template<typename TTo, typename TFrom>
-    struct IsConvertibleImpl<TTo, TFrom, Void<decltype((TTo*) declval<TFrom*>())>> : TrueType {};
-
-    template<typename TTo, typename TFrom>
-    constexpr bool IsConvertible = IsConvertibleImpl<TTo, TFrom>::value;
+    constexpr bool is_convertible = IsConvertible<TTo, TFrom>::value;
 
     // AreConvertible
     template<typename T, typename... TTypes>
-    constexpr bool AreConvertible = (IsConvertible<T, TTypes> && ...);
+    constexpr bool are_convertible = (is_convertible<T, TTypes> && ...);
 
     // AreAssignable
     template<typename T, typename... TTypes>
-    constexpr bool AreAssignable = (IsAssignable<T, TTypes> && ...);
+    constexpr bool are_assignable = (is_assignable<T, TTypes> && ...);
 
     // IsOneOf
     template<typename T, typename... TTypes>
-    constexpr bool IsOneOf = (IsSame<T, TTypes> || ...);
+    constexpr bool is_one_of = (is_same<T, TTypes> || ...);
 
     // AreSameAs
     template<typename T, typename... TTypes>
-    constexpr bool AreSame = (IsSame<T, TTypes> && ...);
+    constexpr bool are_same = (is_same<T, TTypes> && ...);
 
     // IsFloatingPoint
     template<typename T>
-    constexpr bool IsFloatingPoint = IsOneOf<T, f32, f64, long double>;
+    constexpr bool is_floating_point = is_one_of<T, f32, f64, long double>;
 
     // IsSignedIntegral
     template<typename T>
-    constexpr bool IsSignedIntegral = IsOneOf<T, i8, i16, i32, i64>;
+    constexpr bool is_signed_integral = is_one_of<T, i8, i16, i32, i64>;
 
     // IsUnsignedIntegral
     template<typename T>
-    constexpr bool IsUnsignedIntegral = IsOneOf<T, u8, u16, u32, u64>;
+    constexpr bool is_unsigned_integral = is_one_of<T, u8, u16, u32, u64>;
 
     // IsChar
     template<typename T>
-    constexpr bool IsChar = IsOneOf<T, char, unsigned char, wchar_t, char8_t, char16_t, char32_t>;
+    constexpr bool is_char = is_one_of<T, char, unsigned char, wchar_t, char8_t, char16_t, char32_t>;
 
     // IsIntegral
     template<typename T>
-    constexpr bool IsIntegral = IsChar<T> || IsSignedIntegral<T> || IsUnsignedIntegral<T>;
+    constexpr bool is_integral = is_char<T> || is_signed_integral<T> || is_unsigned_integral<T>;
 }// namespace kstd

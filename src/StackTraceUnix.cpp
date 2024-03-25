@@ -77,7 +77,7 @@ namespace kstd {
     }
 
     template<typename T, decltype(auto) TFormer, DWARFHalf... TForms>
-    requires(IsCallable<decltype(TFormer), DWARFAttribute*, T*, DWARFError**>)
+    requires(is_callable<decltype(TFormer), DWARFAttribute*, T*, DWARFError**>)
     [[nodiscard]] auto get_attrib_value(DWARFObject* object, DWARFDie* die, const DWARFHalf attribute) noexcept
         -> Tuple<DWARFAttribute*, T> {
         auto* attrib = get_attrib(die, attribute);

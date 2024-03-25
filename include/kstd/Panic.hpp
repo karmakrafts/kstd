@@ -19,12 +19,19 @@
 // NOLINTEND
 
 #include "SourceLocation.hpp"
+#include "StackTrace.hpp"
 
 namespace kstd {
+#ifdef KSTD_STACKTRACE
+    [[noreturn]] inline void panic(const char* message, KSTD_LOCATION) noexcept {
+        const auto trace = StackTrace::get_current();
+    }
+#else
     [[noreturn]] inline void panic(const char* message, KSTD_LOCATION) noexcept {
         ::printf("Panic at %s:%s:%lu: %s\n", __loc.get_file(), __loc.get_function(), __loc.get_line(), message);
         ::exit(1);
     }
+#endif
 }// namespace kstd
 
 #define KSTD_PANIC(message) kstd::panic(message, __loc)

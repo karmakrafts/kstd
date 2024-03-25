@@ -20,19 +20,24 @@ namespace kstd {
     template<typename T>
     struct SystemAllocator final {
         using value_type = T;
-        static constexpr bool has_state = false;
 
+    private:
+        static constexpr bool is_void = is_same<value_type, void>;
+        static constexpr usize size = is_void ? 1 : sizeof(value_type);
+        static constexpr usize alignment = is_void ? alignof(void*) : alignof(value_type);
+
+    public:
         SystemAllocator() noexcept = default;
         KSTD_DEFAULT_MOVE_COPY(SystemAllocator, SystemAllocator)
         ~SystemAllocator() noexcept = default;
 
         [[nodiscard]] auto allocate(const usize count) noexcept -> value_type* {
-            return static_cast<value_type*>(::malloc(count * sizeof(value_type)));
+            return static_cast<value_type*>(::malloc(count * size));
         }
 
         [[nodiscard]] auto reallocate(value_type* memory, [[maybe_unused]] const usize old_count, const usize count) noexcept
             -> value_type* {
-            return static_cast<value_type*>(::realloc(memory, count * sizeof(value_type)));
+            return static_cast<value_type*>(::realloc(memory, count * size));
         }
 
         auto free(value_type* memory) noexcept -> void {

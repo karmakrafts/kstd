@@ -15,19 +15,19 @@
 
 #include "Meta.hpp"
 
-namespace kstd {
+namespace kstd::concepts {
     template<typename T>
-    concept CharType = IsChar<T>;
+    concept Char = is_char<T>;
 
     template<typename T>
-    concept SignedType = IsSignedIntegral<T>;
+    concept Signed = is_signed_integral<T>;
 
     template<typename T>
-    concept UnsignedType = IsUnsignedIntegral<T>;
+    concept Unsigned = is_unsigned_integral<T>;
 
     template<typename T>
-    concept IntegralType = IsIntegral<T>;
+    concept Integer = is_integral<T>;
 
     template<typename T>
-    concept FloatType = IsFloatingPoint<T>;
+    concept Float = is_floating_point<T>;
 }// namespace kstd

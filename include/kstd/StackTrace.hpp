@@ -22,16 +22,21 @@
 #include "Utility.hpp"
 
 namespace kstd {
-    class StackTraceElement final {
-        void* _address {};
+    struct StackTraceElement final {
+        void* _address;
         String _binary;
         String _file_name;
         String _function_name;
-        usize _line {};
-        usize _column {};
+        usize _line;
+        usize _column;
 
     public:
-        StackTraceElement() noexcept = default;
+        StackTraceElement() noexcept
+            : _address(nullptr)
+            , _line(0)
+            , _column(0) {
+        }
+
         KSTD_DEFAULT_MOVE_COPY(StackTraceElement, StackTraceElement)
         ~StackTraceElement() noexcept = default;
 
@@ -75,12 +80,12 @@ namespace kstd {
     };
 
     class StackTrace final {
-        Array<StackTraceElement> _elements;
+        Array<StackTraceElement> _elements {};
 
         StackTrace() noexcept = default;
 
         explicit StackTrace(Array<StackTraceElement> elements) noexcept
-            : _elements(kstd::move(elements)) {
+            : _elements(move(elements)) {
         }
 
     public:
@@ -92,7 +97,7 @@ namespace kstd {
         }
 
         [[nodiscard]] auto get_depth() const noexcept -> usize {
-            return _elements.size();
+            return _elements.get_size();
         }
 
         [[nodiscard]] static auto get_current(usize depth = 32, usize skip = 1) noexcept -> StackTrace;

@@ -39,7 +39,7 @@ namespace kstd {
         }
 
         template<usize TIndex, typename THead, typename... TTail>
-        requires(IsConvertible<T, THead>)
+        requires(is_convertible<T, THead>)
         constexpr auto set_all_impl(THead&& head, TTail&&... tail) noexcept -> void {
             _data[TIndex] = head;
             if constexpr(sizeof...(tail) > 0) {
@@ -48,7 +48,7 @@ namespace kstd {
         }
 
         template<typename THead, typename... TTail>
-        requires(IsConvertible<T, THead>)
+        requires(is_convertible<T, THead>)
         constexpr auto set_all_impl(const usize offset, THead&& head, TTail&&... tail) noexcept -> void {
             _data[offset] = head;
             if constexpr(sizeof...(tail) > 0) {
@@ -109,7 +109,7 @@ namespace kstd {
     };
 
     template<decltype(auto)... TValues, typename T = PackElement<0, decltype(TValues)...>>
-    requires(AreConvertible<T, decltype(TValues)...>)
+    requires(are_convertible<T, decltype(TValues)...>)
     [[nodiscard]] constexpr auto fixed_array_of() noexcept -> FixedArray<T, sizeof...(TValues)> {
         FixedArray<T, sizeof...(TValues)> array {};
         array.template set_all<0, TValues...>();
@@ -117,7 +117,7 @@ namespace kstd {
     }
 
     template<typename... TArgs, typename T = PackElement<0, TArgs...>>
-    requires(AreConvertible<T, TArgs...>)
+    requires(are_convertible<T, TArgs...>)
     [[nodiscard]] constexpr auto fixed_array_of(TArgs&&... args) noexcept -> FixedArray<T, sizeof...(TArgs)> {
         FixedArray<T, sizeof...(TArgs)> array {};
         array.template set_all<0>(forward<TArgs>(args)...);

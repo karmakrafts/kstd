@@ -17,16 +17,7 @@
 
 #include "Defaults.hpp"
 #include "FixedArray.hpp"
-#include "Utility.hpp"
 
-/*
- * In order to define a custom allocator, the following API must be implemented on your allocator type A:
- *	- typename A::type					     : the type of the underlying element being allocated
- *	- bool A::has_state						 : true if the allocator instance carries state which needs to be retained
- *	- A().allocate(usize)				     : A function for allocating new objects and leaving them uninitialized
- *	- A().reallocate(A::Type*, usize, usize) : A function for reallocating memory blocks and leaving them uninitialized
- *	- A().free(A::Type*)					 : A function for deallocating objects
- */
 namespace kstd {
     /**
      * A default allocator implementation which uses the mimalloc memory allocator.
@@ -36,30 +27,48 @@ namespace kstd {
     template<typename T>
     struct Allocator final {
         using value_type = T;
-        static constexpr bool has_state = false;
 
     private:
-        using self_type = Allocator<value_type>;
+        static constexpr bool is_void = is_same<T, void>;
+        static constexpr usize size = is_void ? 1 : sizeof(T);
+        static constexpr usize alignment = is_void ? alignof(void*) : alignof(T);
 
     public:
         Allocator() noexcept = default;
-        KSTD_DEFAULT_MOVE_COPY(Allocator, self_type)
+        KSTD_DEFAULT_MOVE_COPY(Allocator, Allocator)
         ~Allocator() noexcept = default;
 
-        [[nodiscard]] auto allocate(const usize count) noexcept -> value_type* {
-            return static_cast<value_type*>(::mi_malloc_aligned(sizeof(value_type) * count, alignof(value_type)));
+        [[nodiscard]] auto allocate(const usize count) noexcept -> T* {
+            return static_cast<T*>(::mi_malloc_aligned(size * count, alignment));
         }
 
-        [[nodiscard]] auto reallocate(value_type* value, [[maybe_unused]] const usize old_count, const usize count) noexcept
-            -> value_type* {
-            return static_cast<value_type*>(::mi_realloc_aligned(value, sizeof(value_type) * count, alignof(value_type)));
+        [[nodiscard]] auto reallocate(T* value, [[maybe_unused]] const usize old_count, const usize count) noexcept -> T* {
+            return static_cast<T*>(::mi_realloc_aligned(value, size * count, alignment));
         }
 
-        auto free(value_type* memory) noexcept -> void {
+        auto free(T* memory) noexcept -> void {
             if(memory == nullptr) {
                 return;
             }
             ::mi_free(memory);
         }
     };
+
+    namespace concepts {
+        /*
+         * In order to define a custom allocator, the following API must be implemented on your allocator type A:
+         *	- typename A::value_type					    : the type of the underlying element being allocated
+         *	- A().allocate(usize)				            : A function for allocating new objects and leaving them uninitialized
+         *	- A().reallocate(A::value_type*, usize, usize)  : A function for reallocating memory blocks and leaving them uninitialized
+         *	- A().free(A::value_type*)					    : A function for deallocating objects
+         * When the type specified in the allocator is void, the size of each element shall be 1 and it should have the default alignment.
+         */
+        template<typename T>
+        concept Allocator = requires(T value, usize size) {
+            typename T::value_type;
+            requires is_convertible<typename T::value_type*, decltype(value.allocate(size))>;
+            requires is_convertible<typename T::value_type*, decltype(value.reallocate(nullptr, size, size))>;
+            requires is_same<void, decltype(value.free(nullptr))>;
+        };
+    }// namespace concepts
 }// namespace kstd

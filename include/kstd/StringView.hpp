@@ -19,7 +19,7 @@
 #include "Types.hpp"
 
 namespace kstd {
-    template<IntegralType T>
+    template<concepts::Integer T>
     struct BasicStringView final {
         using char_type = T;
         using slice_type = Slice<char_type>;

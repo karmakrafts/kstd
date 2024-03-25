@@ -11,11 +11,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <gtest/gtest.h>
-#include <kstd/Array.hpp>
-#include <kstd/StackTrace.hpp>
+#include <kstd/Functional.hpp>
 
-TEST(kstd_Array, PushBack) {
-    using namespace kstd;
-    Array<usize> values{};
+using namespace kstd;
+
+auto foo(int, bool, float) noexcept -> void {
 }
+
+static_assert(is_callable<decltype(foo), int, bool, float>);
+static_assert(is_callable_r<decltype(foo), void, int, bool, float>);
+
+auto bar(int) noexcept -> void* {
+    return nullptr;
+}
+
+static_assert(is_callable_r<decltype(bar), void*, int>);

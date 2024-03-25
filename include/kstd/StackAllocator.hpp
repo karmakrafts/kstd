@@ -23,17 +23,21 @@ namespace kstd {
         using value_type = T;
         using fallback_allocator_type = Allocator<T>;
 
-        static constexpr bool has_state = true;
         static constexpr usize buffer_size = TBufferSize;
 
     private:
-        FixedArray<value_type, TBufferSize> _buffer;
+        static constexpr bool is_void = is_same<T, void>;
+        static constexpr usize size = is_void ? 1 : sizeof(T);
+        static constexpr usize alignment = is_void ? alignof(void*) : alignof(T);
+        using internal_type = conditional<is_void, u8, T>;
+
+        FixedArray<internal_type, TBufferSize> _buffer;
         u8* _head;
 
         [[nodiscard]] auto is_address_in_range(const void* address) const noexcept -> bool {
             const auto* byte_address = static_cast<const u8*>(address);
             const auto* base_address = reinterpret_cast<const u8*>(_buffer.get_const_data());
-            const auto* last_address = base_address + _buffer.get_size() * sizeof(value_type);
+            const auto* last_address = base_address + _buffer.get_size() * size;
             return byte_address >= base_address && byte_address <= last_address;
         }
 
@@ -45,29 +49,29 @@ namespace kstd {
         KSTD_DEFAULT_MOVE_COPY(StackAllocator, StackAllocator)
         ~StackAllocator() noexcept = default;
 
-        [[nodiscard]] auto allocate(const usize count) noexcept -> value_type* {
+        [[nodiscard]] auto allocate(const usize count) noexcept -> T* {
             const auto offset = reinterpret_cast<usize>(_head) - reinterpret_cast<usize>(_buffer.get_const_data());
             if(offset == _buffer.get_size()) {
                 return fallback_allocator_type().allocate(count);
             }
             auto* memory = _head;
-            _head += count * sizeof(value_type);
+            _head += count * size;
             *reinterpret_cast<usize*>(memory) = count;
-            return reinterpret_cast<value_type*>(memory);
+            return reinterpret_cast<T*>(memory);
         }
 
-        [[nodiscard]] auto reallocate(value_type* memory, const usize old_count, const usize count) noexcept -> value_type* {
+        [[nodiscard]] auto reallocate(value_type* memory, const usize old_count, const usize count) noexcept -> T* {
             if(!is_address_in_range(memory)) {
                 return fallback_allocator_type().reallocate(memory, old_count, count);
             }
             if(count <= old_count) {
                 return memory;
             }
-            const auto old_size = old_count * sizeof(value_type);
+            const auto old_size = old_count * size;
             if(auto* old_address = _head - old_size; reinterpret_cast<u8*>(memory) == old_address) {
-                const auto offset = (count * sizeof(value_type)) - old_size;
+                const auto offset = (count * size) - old_size;
                 const auto new_size = reinterpret_cast<usize>(_head + offset) - reinterpret_cast<usize>(_buffer.get_const_data());
-                const auto new_count = new_size / sizeof(value_type);
+                const auto new_count = new_size / size;
                 if(new_count <= _buffer.get_size()) {
                     _head += offset;
                     return old_address;

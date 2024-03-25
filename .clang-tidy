@@ -18,7 +18,8 @@ cppcoreguidelines-*,
 bugprone-*,
 -bugprone-assert-side-effect,
 -bugprone-assignment-in-if-condition,
--bugprone-easily-swappable-parameters
+-bugprone-easily-swappable-parameters,
+-bugprone-reserved-identifier
 '
 HeaderFilterRegex: ''
 AnalyzeTemporaryDtors: false

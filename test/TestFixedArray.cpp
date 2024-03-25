@@ -18,7 +18,7 @@ TEST(kstd_FixedArray, fixed_array_of) {
     using namespace kstd;
 
     constexpr auto values = fixed_array_of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
-    static_assert(IsSame<typename decltype(values)::element_type, int>);
+    static_assert(is_same<typename decltype(values)::element_type, int>);
     static_assert(values.get_size() == 10);
 
     for(usize i = 0; i < values.get_size(); i++) {
@@ -30,7 +30,7 @@ TEST(kstd_FixedArray, fixed_array_of_template) {
     using namespace kstd;
 
     constexpr auto values = fixed_array_of<1, 2, 3, 4, 5, 6, 7, 8, 9, 10>();
-    static_assert(IsSame<typename decltype(values)::element_type, int>);
+    static_assert(is_same<typename decltype(values)::element_type, int>);
     static_assert(values.get_size() == 10);
 
     for(usize i = 0; i < values.get_size(); i++) {
