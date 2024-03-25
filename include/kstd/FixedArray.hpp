@@ -45,7 +45,7 @@ namespace kstd {
         ~FixedArray() noexcept = default;
 
         FixedArray(const slice_type& slice) noexcept {
-            slice.copy_to(_data, min(slice.size(), size));
+            slice.copy_to(_data, min(slice.size(), buffer_size));
         }
 
         operator slice_type() const noexcept {

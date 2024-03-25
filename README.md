@@ -14,7 +14,7 @@ On Linux, it is usually required to install the following libraries:
 For Debian based systems which use the apt package manager, the following command may be used:
 
 ```shell
-sudo apt install libunwind8 libunwind-dev libdwarf1 libdwarf1-dev
+sudo apt install libunwind8 libunwind-dev libdwarf1 libdwarf-dev
 ```
 
 ### macOS
