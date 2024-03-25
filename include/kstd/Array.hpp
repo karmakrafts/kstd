@@ -150,7 +150,7 @@ namespace kstd {
         auto insert(const usize index, const T& value) noexcept -> void {
             reserve(_size + 1);
 
-            for(isize i = _size - 1; i >= index; --i) {
+            for(isize i = _size - 1; i >= static_cast<isize>(index); --i) {
                 new(&_data[i + 1]) T(move(_data[i]));
             }
 
@@ -161,12 +161,24 @@ namespace kstd {
         auto insert(const usize index, T&& value) noexcept -> void {
             reserve(_size + 1);
 
-            for(isize i = _size - 1; i >= index; --i) {
+            for(isize i = _size - 1; i >= static_cast<isize>(index); --i) {
                 new(&_data[i + 1]) T(move(_data[i]));
             }
 
             _data[index] = value;
             ++_size;
+        }
+
+        template<concepts::AssignableAs<T>... TArgs>
+        auto insert_all(const usize index, TArgs&&... args) noexcept -> void {
+            reserve(_size + sizeof...(TArgs));
+
+            for (isize i = _size - 1; i >= static_cast<isize>(index); --i) {
+                new (&_data[i + sizeof...(TArgs)]) T(move(_data[i]));
+            }
+
+            set_all_impl(index, forward<TArgs>(args)...);
+            _size += sizeof...(TArgs);
         }
 
         [[nodiscard]] auto begin() noexcept -> iterator {

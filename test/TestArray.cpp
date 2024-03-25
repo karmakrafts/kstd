@@ -73,3 +73,30 @@ TEST(kstd_Array, insert_end) {
 
     ASSERT_EQ(values, array_of(0, 1, 2, 3, 4, 5, 6, 7));
 }
+
+TEST(kstd_Array, insert_all) {
+    using namespace kstd;
+
+    auto values = array_of(0, 1, 2, 6, 7, 8, 9);
+    values.insert_all(3, 3, 4, 5);
+
+    ASSERT_EQ(values, array_of(0, 1, 2, 3, 4, 5, 6, 7, 8, 9));
+}
+
+TEST(kstd_Array, insert_all_empty) {
+    using namespace kstd;
+
+    Array<int> values;
+    values.insert_all(0, 1, 2, 3, 4, 5);
+
+    ASSERT_EQ(values, array_of(1, 2, 3, 4, 5));
+}
+
+TEST(kstd_Array, insert_all_end) {
+    using namespace kstd;
+
+    auto values = array_of(0, 1, 2, 3, 4, 5, 6);
+    values.insert_all(7, 7, 8, 9);
+
+    ASSERT_EQ(values, array_of(0, 1, 2, 3, 4, 5, 6, 7, 8, 9));
+}
