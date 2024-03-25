@@ -106,6 +106,10 @@ if (KSTD_BUILD_TESTS)
     if (KSTD_COMPILER_GCC OR KSTD_COMPILER_CLANG)
         target_compile_options(kstd-tests PRIVATE -g3 -gdwarf-5 -O0 -fno-inline -D_GLIBCXX_DEBUG_BACKTRACE)
     endif ()
+
+    if (KSTD_BUILD_DEBUG AND KSTD_COMPILER_MSVC)
+        target_compile_definitions(kstd-tests PRIVATE _ITERATOR_DEBUG_LEVEL=2) # Enable checked iterators
+    endif ()
 endif ()
 
 # Enable debug options/definitions
@@ -115,7 +119,7 @@ if (KSTD_BUILD_DEBUG)
         target_compile_options(kstd-static PRIVATE -g3 -gdwarf-5 -O0 -fno-inline -D_GLIBCXX_DEBUG_BACKTRACE)
     endif ()
     if (KSTD_COMPILER_MSVC)
-        target_compile_definitions(kstd PRIVATE _ITERATOR_DEBUG_LEVEL=1) # Enable checked iterators
-        target_compile_definitions(kstd-static PRIVATE _ITERATOR_DEBUG_LEVEL=1) # Enable checked iterators
+        target_compile_definitions(kstd PRIVATE _ITERATOR_DEBUG_LEVEL=2) # Enable checked iterators
+        target_compile_definitions(kstd-static PRIVATE _ITERATOR_DEBUG_LEVEL=2) # Enable checked iterators
     endif ()
 endif ()

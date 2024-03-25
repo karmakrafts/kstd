@@ -29,7 +29,7 @@ namespace kstd {
 
     [[nodiscard]] inline auto ensure_init() -> bool {
         if(initialized) {
-            return;
+            return false;
         }
 
         dbgeng = LoadLibraryExW(L"dbgeng.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32);
@@ -91,7 +91,7 @@ namespace kstd {
             return StackTrace {};
         }
 
-        Array<void*> backtrace(depth);
+        Array<void*> backtrace(depth, nullptr);
         const auto num_frames = static_cast<usize>(CaptureStackBackTrace(static_cast<ULONG>(skip), static_cast<DWORD>(depth), backtrace.data(), nullptr));
 
         Array<StackTraceElement> stack_frames(num_frames);

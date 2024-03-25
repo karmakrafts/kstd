@@ -82,6 +82,10 @@ namespace kstd {
             }
         }
 
+        explicit Array(const usize size) noexcept
+            : Array(size, {}) {
+        }
+
         Array(const self_type& other) noexcept
             : _allocator()
             , _size(other._size)
@@ -144,9 +148,25 @@ namespace kstd {
         }
 
         auto insert(const usize index, const T& value) noexcept -> void {
+            reserve(_size + 1);
+
+            for(usize i = _size - 1; i >= index; ++i) {
+                new(&_data[i + 1]) T(move(_data[i]));
+            }
+
+            _data[index] = value;
+            ++_size;
         }
 
         auto insert(const usize index, T&& value) noexcept -> void {
+            reserve(_size + 1);
+
+            for(isize i = _size - 1; i >= index; --i) {
+                new(&_data[i + 1]) T(move(_data[i]));
+            }
+
+            _data[index] = value;
+            ++_size;
         }
 
         [[nodiscard]] auto begin() noexcept -> iterator {
@@ -253,6 +273,14 @@ namespace kstd {
             return _capacity;
         }
 
+        [[nodiscard]] auto data() noexcept -> T* {
+            return _data;
+        }
+
+        [[nodiscard]] auto data() const noexcept -> const T* {
+            return _data;
+        }
+
         [[nodiscard]] auto at(const usize index) noexcept -> T& {
             if(index >= _size) {
                 panic("Array index out of bounds");
@@ -284,13 +312,31 @@ namespace kstd {
         [[nodiscard]] auto operator[](const usize index) const noexcept -> const T& {
             return _data[index];
         }
+
+        [[nodiscard]] auto operator==(const Array<T>& other) const noexcept -> bool {
+            if(&other == this) {
+                return true;
+            }
+
+            if(other._size != _size) {
+                return false;
+            }
+
+            for(usize i = 0; i < _size; i++) {
+                if(_data[i] != other[i]) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
     };
 
     template<typename... TArgs, typename T = PackElement<0, TArgs...>>
     requires(are_assignable<T, TArgs...>)
     [[nodiscard]] constexpr auto array_of(TArgs&&... args) noexcept -> Array<T> {
-        Array<T> array {};
-        array.set_all(forward<TArgs>(args)...);
+        Array<T> array(sizeof...(TArgs));
+        array.set_all(0, forward<TArgs>(args)...);
         return array;
     }
 }// namespace kstd

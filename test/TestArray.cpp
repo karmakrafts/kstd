@@ -46,3 +46,30 @@ TEST(kstd_Array, front) {
     using namespace kstd;
     Array<usize> values {};
 }
+
+TEST(kstd_Array, insert) {
+    using namespace kstd;
+
+    auto values = array_of(0, 1, 2, 3, 4, 6, 7, 8, 9);
+    values.insert(5, 5);
+
+    ASSERT_EQ(values, array_of(0, 1, 2, 3, 4, 5, 6, 7, 8, 9));
+}
+
+TEST(kstd_Array, insert_empty) {
+    using namespace kstd;
+
+    Array<int> values;
+    values.insert(0, 1);
+
+    ASSERT_EQ(values, array_of(1));
+}
+
+TEST(kstd_Array, insert_end) {
+    using namespace kstd;
+
+    auto values = array_of(0, 1, 2, 3, 4, 5, 6);
+    values.insert(7, 7);
+
+    ASSERT_EQ(values, array_of(0, 1, 2, 3, 4, 5, 6, 7));
+}
