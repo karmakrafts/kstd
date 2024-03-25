@@ -14,9 +14,14 @@
 #pragma once
 
 #include <fmt/format.h>
-#include <string>
+
+#include "Concepts.hpp"
 
 namespace kstd {
-    // TODO: Replace these..
+    template<concepts::Integer T>
+    struct BasicString final {
+
+    };
+
     using String = std::string;
 }// namespace kstd

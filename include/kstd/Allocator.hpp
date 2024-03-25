@@ -63,7 +63,7 @@ namespace kstd {
          *	- A().free(A::value_type*)					    : A function for deallocating objects
          * When the type specified in the allocator is void, the size of each element shall be 1 and it should have the default alignment.
          */
-        template<typename TValueType, typename T>
+        template<typename T, typename TValueType>
         concept Allocator = requires(T value, usize size) {
             typename T::value_type;
             requires is_same<typename T::value_type, TValueType>;

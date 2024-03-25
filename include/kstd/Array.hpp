@@ -173,8 +173,8 @@ namespace kstd {
         auto insert_all(const usize index, TArgs&&... args) noexcept -> void {
             reserve(_size + sizeof...(TArgs));
 
-            for (isize i = _size - 1; i >= static_cast<isize>(index); --i) {
-                new (&_data[i + sizeof...(TArgs)]) T(move(_data[i]));
+            for(isize i = _size - 1; i >= static_cast<isize>(index); --i) {
+                new(&_data[i + sizeof...(TArgs)]) T(move(_data[i]));
             }
 
             set_all_impl(index, forward<TArgs>(args)...);
