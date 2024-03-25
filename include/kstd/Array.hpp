@@ -78,7 +78,7 @@ namespace kstd {
             , _capacity(_size)
             , _data(_allocator.allocate(_capacity)) {
             for(usize i = 0; i < size; ++i) {
-                _data[i] = default_value;
+                new (&_data[i]) T(default_value);
             }
         }
 

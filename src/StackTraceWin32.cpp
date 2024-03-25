@@ -95,6 +95,7 @@ namespace kstd {
         const auto num_frames = static_cast<usize>(CaptureStackBackTrace(static_cast<ULONG>(skip), static_cast<DWORD>(depth), backtrace.data(), nullptr));
 
         Array<StackTraceElement> stack_frames(num_frames);
+
         for(usize i = 0; i < num_frames; i++) {
             const auto address = reinterpret_cast<usize>(backtrace[i]);
 
