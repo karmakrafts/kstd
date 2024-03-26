@@ -41,7 +41,7 @@ namespace kstd {
                 : _current_node(current_node) {
             }
 
-            auto operator==(const Iterator& other) const noexcept -> bool {
+            [[nodiscard]] auto operator==(const Iterator& other) const noexcept -> bool {
                 return _current_node == other._current_node;
             }
 
@@ -106,7 +106,7 @@ namespace kstd {
             node_type* new_node = _allocator.allocate(1);
             new_node->last = node;
             new_node->next = node->next;
-            new_node->data = value;
+            new_node->data = std::move(value);
 
             // Insert node
             if (node->next != nullptr) {
@@ -118,10 +118,10 @@ namespace kstd {
             _size++;
         }
 
-        auto push_front(const T data) noexcept -> void {
+        auto push_front(const T value) noexcept -> void {
             node_type* node = _allocator.allocate(1);
             new(node) node_type();
-            node->data = data;
+            node->data = std::move(value);
             if(_first_node == nullptr) {
                 _first_node = _last_node = node;
             }
@@ -140,7 +140,7 @@ namespace kstd {
 
             auto value = _first_node->data;
             _first_node = _first_node->next;
-            return value;
+            return std::move(value);
         }
 
         auto peek_front() const noexcept -> const T& {
@@ -157,10 +157,10 @@ namespace kstd {
             return _first_node->data;
         }
 
-        auto push_back(const T data) noexcept -> void {
+        auto push_back(const T value) noexcept -> void {
             node_type* node = _allocator.allocate(1);
             new(node) node_type();
-            node->data = data;
+            node->data = std::move(value);
             if(_last_node == nullptr) {
                 _first_node = _last_node = node;
             }
@@ -177,9 +177,9 @@ namespace kstd {
                 panic("Unable to pop back because no elements are inserted");
             }
 
-            auto value = _last_node->data;
+            auto value = std::move(_last_node->data);
             _last_node = _last_node->last;
-            return value;
+            return std::move(value);
         }
 
         auto peek_back() const noexcept -> const T& {
