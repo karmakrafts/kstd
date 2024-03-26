@@ -21,14 +21,15 @@
 #include "Utility.hpp"
 
 namespace kstd {
-    template<typename T, usize TSize>
-    struct FixedArray final {
+    template<typename T, usize TSize, usize TAlignment = alignof(T)>
+    struct FixedArray {
         using element_type = T;
         using slice_type = Slice<element_type>;
         static constexpr usize buffer_size = TSize;
+        static constexpr usize buffer_alignment = TAlignment;
 
     private:
-        element_type _data[buffer_size];
+        element_type _data[buffer_size] alignas(TAlignment);
 
         template<typename THead, typename... TTail>
         requires(is_convertible<T, THead>)
@@ -72,6 +73,10 @@ namespace kstd {
 
         [[nodiscard]] constexpr auto size() const noexcept -> usize {
             return buffer_size;
+        }
+
+        [[nodiscard]] constexpr auto alignment() const noexcept -> usize {
+            return buffer_alignment;
         }
 
         [[nodiscard]] constexpr auto operator[](const usize index) noexcept -> element_type& {

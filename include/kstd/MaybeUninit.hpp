@@ -42,15 +42,12 @@ namespace kstd {
             return *this;
         }
 
-        // This may not be used as the right hand side of an assignment to T
-        operator T&&() noexcept = delete;
-
-        [[nodiscard]] operator T&() noexcept {
+        [[nodiscard]] auto assume_init() noexcept -> T& {
             return *reinterpret_cast<T*>(_data.data());
         }
 
-        [[nodiscard]] operator const T&() const noexcept {
-            return *reinterpret_cast<const T*>(_data.data());
+        [[nodiscard]] auto assume_init() const noexcept -> const T& {
+            return *reinterpret_cast<T*>(_data.data());
         }
     };
 }// namespace kstd
