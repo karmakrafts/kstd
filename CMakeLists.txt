@@ -95,8 +95,8 @@ target_link_libraries(kstd-static PRIVATE mimalloc-static)
 set(FMT_EXCEPTIONS OFF)
 set(FMT_NOEXCEPT ON)
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/libs/fmt")
-target_link_libraries(kstd PRIVATE fmt::fmt)
-target_link_libraries(kstd-static PRIVATE fmt::fmt)
+target_link_libraries(kstd PUBLIC fmt::fmt)
+target_link_libraries(kstd-static PUBLIC fmt::fmt)
 
 # Tests
 if (KSTD_BUILD_TESTS)
