@@ -81,15 +81,15 @@ endif ()
 
 # libdwarf
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/libs/libdwarf")
-target_link_libraries(kstd PRIVATE libdwarf::dwarf-static)
-target_link_libraries(kstd-static PRIVATE libdwarf::dwarf-static)
+target_link_libraries(kstd PUBLIC libdwarf::dwarf-static)
+target_link_libraries(kstd-static PUBLIC libdwarf::dwarf-static)
 
 # mimalloc memory allocator
 set(MI_BUILD_STATIC ON) # Make sure we enable the static target
 set(MI_OVERRIDE OFF) # We don't want to replace standard malloc calls
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/libs/mimalloc")
-target_link_libraries(kstd PRIVATE mimalloc-static)
-target_link_libraries(kstd-static PRIVATE mimalloc-static)
+target_link_libraries(kstd PUBLIC mimalloc-static)
+target_link_libraries(kstd-static PUBLIC mimalloc-static)
 
 # fmt formatting library
 set(FMT_EXCEPTIONS OFF)
