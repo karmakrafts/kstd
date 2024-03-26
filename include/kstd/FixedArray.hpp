@@ -22,14 +22,14 @@
 
 namespace kstd {
     template<typename T, usize TSize, usize TAlignment = alignof(T)>
-    struct FixedArray {
+    struct alignas(TAlignment) FixedArray {
         using element_type = T;
         using slice_type = Slice<element_type>;
         static constexpr usize buffer_size = TSize;
         static constexpr usize buffer_alignment = TAlignment;
 
     private:
-        element_type _data[buffer_size] alignas(TAlignment);
+        element_type _data[buffer_size];
 
         template<typename THead, typename... TTail>
         requires(is_convertible<T, THead>)
