@@ -82,7 +82,7 @@ namespace kstd {
 
         StackTrace() noexcept = default;
 
-        explicit StackTrace(Array<StackTraceElement> elements) noexcept
+        StackTrace(Array<StackTraceElement> elements) noexcept
             : _elements(move(elements)) {
         }
 
