@@ -15,6 +15,7 @@
 
 #include "FixedArray.hpp"
 #include "Types.hpp"
+#include "Utility.hpp"
 
 namespace kstd {
     template<typename T>
@@ -22,12 +23,27 @@ namespace kstd {
         using value_type = T;
 
     private:
-        FixedArray<u8, sizeof(T)> alignas(T) _data;
+        using self_type = MaybeUninit<T>;
+
+        FixedArray<u8, sizeof(T), alignof(T)> _data;
 
     public:
         constexpr MaybeUninit() noexcept = default;
         KSTD_DEFAULT_MOVE_COPY(MaybeUninit, MaybeUninit, constexpr);
         ~MaybeUninit() noexcept = default;
+
+        auto operator=(T&& value) noexcept -> self_type {
+            *reinterpret_cast<T*>(_data.data()) = forward<T>(value);
+            return *this;
+        }
+
+        auto operator=(const T& value) noexcept -> self_type {
+            *reinterpret_cast<T*>(_data.data()) = value;
+            return *this;
+        }
+
+        // This may not be used as the right hand side of an assignment to T
+        operator T&&() noexcept = delete;
 
         [[nodiscard]] operator T&() noexcept {
             return *reinterpret_cast<T*>(_data.data());
