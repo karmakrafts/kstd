@@ -106,7 +106,7 @@ namespace kstd {
             node_type* new_node = _allocator.allocate(1);
             new_node->last = node;
             new_node->next = node->next;
-            new_node->data = std::move(value);
+            new_node->data = move(value);
 
             // Insert node
             if (node->next != nullptr) {
@@ -121,7 +121,7 @@ namespace kstd {
         auto push_front(const T value) noexcept -> void {
             node_type* node = _allocator.allocate(1);
             new(node) node_type();
-            node->data = std::move(value);
+            node->data = move(value);
             if(_first_node == nullptr) {
                 _first_node = _last_node = node;
             }
@@ -140,7 +140,7 @@ namespace kstd {
 
             auto value = _first_node->data;
             _first_node = _first_node->next;
-            return std::move(value);
+            return move(value);
         }
 
         auto peek_front() const noexcept -> const T& {
@@ -160,7 +160,7 @@ namespace kstd {
         auto push_back(const T value) noexcept -> void {
             node_type* node = _allocator.allocate(1);
             new(node) node_type();
-            node->data = std::move(value);
+            node->data = move(value);
             if(_last_node == nullptr) {
                 _first_node = _last_node = node;
             }
@@ -177,9 +177,9 @@ namespace kstd {
                 panic("Unable to pop back because no elements are inserted");
             }
 
-            auto value = std::move(_last_node->data);
+            auto value = move(_last_node->data);
             _last_node = _last_node->last;
-            return std::move(value);
+            return value;
         }
 
         auto peek_back() const noexcept -> const T& {
