@@ -88,7 +88,7 @@ namespace kstd {
 
     auto StackTrace::get_current(const usize depth, const usize skip) noexcept -> StackTrace {
         if(!ensure_init()) {
-            return StackTrace {};
+            return {};
         }
 
         Array<void*> backtrace(depth, nullptr);
@@ -142,7 +142,7 @@ namespace kstd {
             stack_frames[i] = StackTraceElement {backtrace[i], binary, file, function_name, line, 0};
         }
 
-        return StackTrace {kstd::move(stack_frames)};
+        return {kstd::move(stack_frames)};
     }
 
 }// namespace kstd

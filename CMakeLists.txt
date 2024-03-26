@@ -79,19 +79,24 @@ if (KSTD_ENABLE_MOLD)
     endif () # MOLD_EXECUTABLE AND NOT COMPILER_CLANG
 endif ()
 
+# libdwarf
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/libs/libdwarf")
+target_link_libraries(kstd PRIVATE libdwarf::dwarf-static)
+target_link_libraries(kstd-static PRIVATE libdwarf::dwarf-static)
+
 # mimalloc memory allocator
 set(MI_BUILD_STATIC ON) # Make sure we enable the static target
 set(MI_OVERRIDE OFF) # We don't want to replace standard malloc calls
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/libs/mimalloc")
-target_link_libraries(kstd PUBLIC mimalloc-static)
-target_link_libraries(kstd-static PUBLIC mimalloc-static)
+target_link_libraries(kstd PRIVATE mimalloc-static)
+target_link_libraries(kstd-static PRIVATE mimalloc-static)
 
 # fmt formatting library
 set(FMT_EXCEPTIONS OFF)
 set(FMT_NOEXCEPT ON)
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/libs/fmt")
-target_link_libraries(kstd PUBLIC fmt::fmt-header-only)
-target_link_libraries(kstd-static PUBLIC fmt::fmt-header-only)
+target_link_libraries(kstd PRIVATE fmt::fmt)
+target_link_libraries(kstd-static PRIVATE fmt::fmt)
 
 # Tests
 if (KSTD_BUILD_TESTS)

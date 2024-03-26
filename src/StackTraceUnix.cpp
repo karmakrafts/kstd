@@ -17,8 +17,8 @@
 
 #include <cxxabi.h>
 #include <dlfcn.h>
-#include <libdwarf/dwarf.h>
-#include <libdwarf/libdwarf.h>
+#include <dwarf.h>
+#include <libdwarf.h>
 #include <libunwind.h>
 
 #include "kstd/Array.hpp"
@@ -239,16 +239,16 @@ namespace kstd {
 
     auto StackTrace::get_current(const usize depth, const usize skip) noexcept -> StackTrace {
         if(depth == 0) {
-            return StackTrace {};
+            return {};
         }
         unw_context_t context;
         if(unw_getcontext(&context) != UNW_ESUCCESS) {
-            return StackTrace {};
+            return {};
         }
 
         unw_cursor_t cursor;
         if(unw_init_local(&cursor, &context) != UNW_ESUCCESS) {
-            return StackTrace {};
+            return {};
         }
 
         FixedArray<char, MAX_NAME_SIZE> name_buffer {};
@@ -285,7 +285,7 @@ namespace kstd {
             ++index;
         }
 
-        return StackTrace(move(stack_frames));
+        return {move(stack_frames)};
     }
 }// namespace kstd
 
