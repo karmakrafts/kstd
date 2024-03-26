@@ -14,7 +14,11 @@
 #pragma once
 
 // NOLINTBEGIN
+#ifdef KSTD_PLATFORM_MACOS
+#include <malloc/malloc.h>
+#else
 #include <malloc.h>
+#endif
 #include <string.h>
 #include <wchar.h>
 // NOLINTEND
