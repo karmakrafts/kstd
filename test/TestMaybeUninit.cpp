@@ -26,7 +26,7 @@ TEST(kstd_MaybeUninit, set) {
 
     values = array_of<usize>(0, 1, 2, 3, 4);
 
-    const auto& array = static_cast<const Array<usize>&>(values);
+    const auto& array = values.assume_init();
     ASSERT_EQ(array.size(), 5);
     for(usize i = 0; i < array.size(); ++i) {
         ASSERT_EQ(array[i], i);
