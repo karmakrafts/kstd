@@ -19,6 +19,8 @@ namespace kstd {
     template<typename... TTypes>
     using Tuple = std::tuple<TTypes...>;
 
+    template<typename TLeft, typename TRight>
+    using Pair = std::pair<TLeft, TRight>;
+
     using std::get;
-    using std::make_tuple;
 }

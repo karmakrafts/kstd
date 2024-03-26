@@ -79,13 +79,13 @@ namespace kstd {
     template<typename T, decltype(auto) TFormer, DWARFHalf... TForms>
     requires(is_callable<decltype(TFormer), DWARFAttribute*, T*, DWARFError**>)
     [[nodiscard]] auto get_attrib_value(DWARFObject* object, DWARFDie* die, const DWARFHalf attribute) noexcept
-        -> Tuple<DWARFAttribute*, T> {
+        -> Pair<DWARFAttribute*, T> {
         auto* attrib = get_attrib(die, attribute);
         if(attrib == nullptr) {
             return {nullptr, {}};
         }
-        DWARFHalf form;
         DWARFError* error = nullptr;
+        DWARFHalf form;
         if(dwarf_whatform(attrib, &form, &error) != DW_DLV_OK || ((form != TForms) && ...)) {
             dwarf_dealloc(object, attrib, DW_DLA_ATTR);
             return {nullptr, {}};
@@ -138,9 +138,9 @@ namespace kstd {
                                           usize& column,
                                           Queue<DWARFDie*>& queue,
                                           const Array<String>& file_names) noexcept -> bool {// NOLINT
-        DWARFError* error = nullptr;
         // Check if our current DIE is a subprogram aka. function
         DWARFHalf tag;
+        DWARFError* error = nullptr;
         if(dwarf_tag(die, &tag, &error) == DW_DLV_OK && tag == DW_TAG_subprogram) {
             char* name;
             if(dwarf_diename(die, &name, &error) != DW_DLV_OK || name == nullptr) {
@@ -177,12 +177,12 @@ namespace kstd {
     [[nodiscard]] inline auto get_source_info(const String& binary, const String& mangled_name) noexcept -> Tuple<String, usize, usize> {
         // Initialize DWARF debug object
         DWARFObject* object = nullptr;
-        DWARFError* error = nullptr;
-        if(dwarf_init_path(binary.c_str(), nullptr, 0, DW_GROUPNUMBER_ANY, 0, nullptr, nullptr, &object, nullptr, 0, nullptr, &error) !=
+        if(dwarf_init_path(binary.c_str(), nullptr, 0, DW_GROUPNUMBER_ANY, 0, nullptr, nullptr, &object, nullptr, 0, nullptr, nullptr) !=
            DW_DLV_OK) {
             return {"", 0, 0};
         }
         // Iterate through compilation units
+        DWARFError* error = nullptr;
         DWARFUnsigned cu_header_length;
         DWARFHalf cu_header_version;
         DWARFOff cu_abbrev_offset;
@@ -191,6 +191,7 @@ namespace kstd {
         String file_name {};
         usize line = 0;
         usize column = 0;
+        bool found = false;
         while(dwarf_next_cu_header(object, &cu_header_length, &cu_header_version, &cu_abbrev_offset, &cu_address_size,
                                    &cu_next_header_offset, &error) == DW_DLV_OK) {
             // Retrieve compilation unit root DIE
@@ -220,10 +221,14 @@ namespace kstd {
                         dwarf_dealloc_die(queue.front());
                         queue.pop();
                     }
+                    found = true;
                     break;
                 }
                 dwarf_dealloc_die(current_die);// Deallocate die after we're done
                 queue.pop();
+            }
+            if(found) {
+                break;
             }
         }
 
