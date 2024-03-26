@@ -155,7 +155,8 @@ namespace kstd {
             dwarf_dealloc(object, name, DW_DLA_STRING);// Deallocate name string when we're done
             // If the linkage name matches the mangled name, this is a mangled (likely C++) function and we found it
             const auto [linkage_name_attrib, linkage_name] =
-                get_attrib_value<char*, &dwarf_formstring, DW_FORM_strp, DW_FORM_string>(object, die, DW_AT_linkage_name);
+                get_attrib_value<char*, &dwarf_formstring, DW_FORM_strp, DW_FORM_string, DW_FORM_strx, DW_FORM_strx1, DW_FORM_strx2,
+                                 DW_FORM_strx3, DW_FORM_strx4>(object, die, DW_AT_linkage_name);
             if(linkage_name_attrib != nullptr && linkage_name != nullptr && mangled_name == linkage_name) {
                 extract_die_information(object, die, file_name, line, column, file_names);
                 dwarf_dealloc(object, linkage_name, DW_DLA_STRING);
@@ -265,11 +266,13 @@ namespace kstd {
             void* ip;
             if(unw_get_reg(&cursor, UNW_REG_IP, reinterpret_cast<unw_word_t*>(&ip)) != UNW_ESUCCESS || ip == nullptr) {
                 stack_frames.emplace_back();
+                ++index;
                 continue;
             }
             unw_word_t offset;
             if(unw_get_proc_name(&cursor, name_buffer.data(), MAX_NAME_SIZE, &offset) != UNW_ESUCCESS) {
                 stack_frames.emplace_back();
+                ++index;
                 continue;
             }
 
