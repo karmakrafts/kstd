@@ -13,6 +13,8 @@ AllowShortIfStatementsOnASingleLine: Never
 AllowShortLambdasOnASingleLine: None
 AllowShortLoopsOnASingleLine: false
 AlwaysBreakAfterReturnType: None
+AlwaysBreakAfterDefinitionReturnType: None
+IndentWrappedFunctionNames: true
 AlwaysBreakTemplateDeclarations: Yes
 BreakBeforeBraces: Custom
 BraceWrapping:
