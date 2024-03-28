@@ -20,16 +20,32 @@ TEST(kstd_Array, array_of) {
     auto values = array_of(0, 1, 2, 3, 4, 5, 6, 7, 8, 9);
     static_assert(is_same<typename decltype(values)::element_type, i32>);
     ASSERT_EQ(values.size(), 10);
+    for(usize i = 0; i < values.size(); ++i) {
+        ASSERT_EQ(values[i], i);
+    }
 }
 
 TEST(kstd_Array, push_back) {
     using namespace kstd;
     Array<usize> values {};
+    for(usize i = 0; i < 10; ++i) {
+        values.push_back(i);
+        ASSERT_EQ(values.size(), i + 1);
+        ASSERT_EQ(values[i], i);
+    }
 }
 
 TEST(kstd_Array, pop_back) {
     using namespace kstd;
-    Array<usize> values {};
+    auto values = array_of(0, 1, 2, 3, 4, 5, 6, 7, 8, 9);
+    for(usize i = 0; i < 5; ++i) {
+        ASSERT_EQ(values.size(), 10 - i);
+        values.pop_back();
+    }
+    ASSERT_EQ(values.size(), 5);
+    for(usize i = 0; i < 5; ++i) {
+        ASSERT_EQ(values[i], i);
+    }
 }
 
 TEST(kstd_Array, emplace_back) {

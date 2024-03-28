@@ -96,7 +96,7 @@ namespace kstd {
             , _capacity(other._capacity)
             , _data(_allocator.allocate(_capacity)) {
             for(usize i = 0; i < _capacity; ++i) {
-                new(&_data[i]) T(move(other._data[i]));
+                new(&_data[i]) T(kstd::move(other._data[i]));
             }
         }
 
@@ -136,21 +136,21 @@ namespace kstd {
             _allocator = other._allocator;
             resize(other._size);
             for(usize i = 0; i < _capacity; ++i) {
-                new(&_data[i]) T(move(other._data[i]));
+                new(&_data[i]) T(kstd::move(other._data[i]));
             }
             return *this;
         }
 
         template<concepts::AssignableAs<T>... TArgs>
         auto set_all(const usize index, TArgs&&... values) noexcept -> void {
-            set_all_impl<TArgs...>(index, forward<TArgs>(values)...);
+            set_all_impl<TArgs...>(index, kstd::forward<TArgs>(values)...);
         }
 
         auto insert(const usize index, const T& value) noexcept -> void {
             reserve(_size + 1);
 
             for(isize i = _size - 1; i >= static_cast<isize>(index); --i) {
-                new(&_data[i + 1]) T(move(_data[i]));
+                new(&_data[i + 1]) T(kstd::move(_data[i]));
             }
 
             _data[index] = value;
@@ -161,7 +161,7 @@ namespace kstd {
             reserve(_size + 1);
 
             for(isize i = _size - 1; i >= static_cast<isize>(index); --i) {
-                new(&_data[i + 1]) T(move(_data[i]));
+                new(&_data[i + 1]) T(kstd::move(_data[i]));
             }
 
             _data[index] = value;
@@ -173,10 +173,10 @@ namespace kstd {
             reserve(_size + sizeof...(TArgs));
 
             for(isize i = _size - 1; i >= static_cast<isize>(index); --i) {
-                new(&_data[i + sizeof...(TArgs)]) T(move(_data[i]));
+                new(&_data[i + sizeof...(TArgs)]) T(kstd::move(_data[i]));
             }
 
-            set_all_impl(index, forward<TArgs>(args)...);
+            set_all_impl(index, kstd::forward<TArgs>(args)...);
             _size += sizeof...(TArgs);
         }
 
@@ -220,13 +220,13 @@ namespace kstd {
 
         auto push_back(T&& value) noexcept -> void {
             reserve(_size + 1);
-            _data[_size++] = forward<T>(value);
+            _data[_size++] = kstd::forward<T>(value);
         }
 
         template<concepts::AssignableAs<T>... TArgs>
         constexpr auto push_back_all(TArgs&&... values) noexcept -> void {
             reserve(_size + sizeof...(TArgs));
-            set_all_impl<TArgs...>(_size, forward<TArgs>(values)...);
+            set_all_impl<TArgs...>(_size, kstd::forward<TArgs>(values)...);
         }
 
         auto pop_back() noexcept -> void {
@@ -347,7 +347,7 @@ namespace kstd {
     requires(are_assignable<T, TArgs...>)
     [[nodiscard]] constexpr auto array_of(TArgs&&... args) noexcept -> Array<T> {
         Array<T> array(sizeof...(TArgs));
-        array.set_all(0, forward<TArgs>(args)...);
+        array.set_all(0, kstd::forward<TArgs>(args)...);
         return array;
     }
 }// namespace kstd
