@@ -12,7 +12,10 @@ set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake;")
 include(kstd-platform)
 
 # Library
-file(GLOB_RECURSE KSTD_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/include/kstd/*.hpp")
+file(GLOB_RECURSE KSTD_SOURCE_FILES
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/*.hpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/include/kstd/*.hpp")
 
 add_library(kstd SHARED ${KSTD_SOURCE_FILES})
 target_include_directories(kstd PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
