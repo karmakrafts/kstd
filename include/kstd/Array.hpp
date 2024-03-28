@@ -78,7 +78,7 @@ namespace kstd {
             , _capacity(_size)
             , _data(_allocator.allocate(_capacity)) {
             for(usize i = 0; i < size; ++i) {
-                new (&_data[i]) T(default_value);
+                new(&_data[i]) T(default_value);
             }
         }
 
@@ -91,11 +91,13 @@ namespace kstd {
         }
 
         Array(self_type&& other) noexcept
-            : _allocator(move(other._allocator))
+            : _allocator(other._allocator)
             , _size(other._size)
             , _capacity(other._capacity)
-            , _data(other._data) {
-            other._data = nullptr;
+            , _data(_allocator.allocate(_capacity)) {
+            for(usize i = 0; i < _capacity; ++i) {
+                new(&_data[i]) T(move(other._data[i]));
+            }
         }
 
         Array(const slice_type& slice) noexcept
@@ -107,12 +109,13 @@ namespace kstd {
         }
 
         ~Array() noexcept {
-            if(_data != nullptr) {
-                for(usize i = 0; i < _size; ++i) {
-                    _data[i].~T();// Call destructor on all contained elements
-                }
-                _allocator.free(_data);
+            if(_data == nullptr) {
+                return;
             }
+            for(usize i = 0; i < _size; ++i) {
+                _data[i].~T();// Call destructor on all contained elements
+            }
+            _allocator.free(_data);
         }
 
         [[nodiscard]] operator slice_type() const noexcept {
@@ -130,11 +133,11 @@ namespace kstd {
         }
 
         auto operator=(self_type&& other) noexcept -> self_type& {
-            _allocator = move(other._allocator);
-            _data = other._data;
-            _size = other._size;
-            _capacity = other._capacity;
-            other._data = nullptr;
+            _allocator = other._allocator;
+            resize(other._size);
+            for(usize i = 0; i < _capacity; ++i) {
+                new(&_data[i]) T(move(other._data[i]));
+            }
             return *this;
         }
 

@@ -42,4 +42,12 @@ namespace kstd {
 
     template<typename T, typename TReturn, typename... TArgs>
     constexpr bool is_callable_r = IsCallableR<T, TReturn, TArgs...>::value;
+
+    namespace concepts {
+        template<typename T, typename... TArgs>
+        concept Callable = is_callable<T, TArgs...>;
+
+        template<typename T, typename TReturn, typename... TArgs>
+        concept CallableR = is_callable_r<T, TReturn, TArgs...>;
+    }
 }// namespace kstd
