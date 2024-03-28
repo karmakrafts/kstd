@@ -171,7 +171,7 @@ namespace kstd {
         if(dwarf_child(die, &child_die, &error) == DW_DLV_OK && child_die != nullptr) {
             do {
                 queue.push(child_die);
-            } while(dwarf_siblingof_b(object, child_die, false, &child_die, &error) == DW_DLV_OK && child_die != nullptr);
+            } while(dwarf_siblingof_b(object, child_die, TRUE, &child_die, &error) == DW_DLV_OK && child_die != nullptr);
         }
         return false;
     }
@@ -179,11 +179,11 @@ namespace kstd {
     [[nodiscard]] inline auto get_source_info(const String& binary, const String& mangled_name) noexcept -> Tuple<String, usize, usize> {
         // Initialize DWARF debug object
         DWARFObject* object = nullptr;
-        if(dwarf_init_path_a(binary.c_str(), nullptr, 0, DW_GROUPNUMBER_ANY, 0, nullptr, nullptr, &object, nullptr) != DW_DLV_OK) {
+        DWARFError* error = nullptr;
+        if(dwarf_init_path_a(binary.c_str(), nullptr, 0, DW_GROUPNUMBER_ANY, 0, nullptr, nullptr, &object, &error) != DW_DLV_OK) {
             return {"", 0, 0};
         }
         // Iterate through compilation units
-        DWARFError* error = nullptr;
         DWARFUnsigned cu_header_length;
         DWARFHalf cu_header_version;
         DWARFOff cu_abbrev_offset;
@@ -198,12 +198,12 @@ namespace kstd {
         usize line = 0;
         usize column = 0;
         bool found = false;
-        while(dwarf_next_cu_header_d(object, false, &cu_header_length, &cu_header_version, &cu_abbrev_offset, &cu_address_size,
+        while(dwarf_next_cu_header_d(object, TRUE, &cu_header_length, &cu_header_version, &cu_abbrev_offset, &cu_address_size,
                                      &cu_length_size, &cu_extension_size, &cu_type_signature, &cu_type_offset, &cu_next_header_offset,
                                      &cu_header_type, &error) == DW_DLV_OK) {
             // Retrieve compilation unit root DIE
             DWARFDie* die;
-            if(dwarf_siblingof_b(object, nullptr, false, &die, &error) != DW_DLV_OK || die == nullptr) {
+            if(dwarf_siblingof_b(object, nullptr, TRUE, &die, &error) != DW_DLV_OK || die == nullptr) {
                 continue;
             }
             // Extract source file name table
