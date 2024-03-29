@@ -28,6 +28,14 @@
 #include "kstd/Queue.hpp"
 #include "kstd/Tuple.hpp"
 
+#ifndef TRUE
+#define TRUE 1
+#endif
+
+#ifndef FALSE
+#define FALSE 0
+#endif
+
 namespace kstd {
     // Make sure the pointer size matches the unwind word size
     static_assert(sizeof(unw_word_t) >= sizeof(void*));
@@ -59,7 +67,7 @@ namespace kstd {
     [[nodiscard]] inline auto get_binary(const void* address) noexcept -> String {
         Dl_info symbol_info;
         if(dladdr(address, &symbol_info) > 0 && symbol_info.dli_fname) {
-            return String(symbol_info.dli_fname);
+            return {symbol_info.dli_fname};
         }
         return "";
     }
