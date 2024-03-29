@@ -91,7 +91,7 @@ namespace kstd {
         }
 
         Array(self_type&& other) noexcept
-            : _allocator(other._allocator)
+            : _allocator()
             , _size(other._size)
             , _capacity(other._capacity)
             , _data(_allocator.allocate(_capacity)) {
