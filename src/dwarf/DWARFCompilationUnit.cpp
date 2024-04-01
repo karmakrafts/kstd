@@ -41,7 +41,7 @@ namespace kstd {
             do {
                 _entries.emplace_back(_object, this, child);
                 queue.push(child);
-            } while(dwarf_siblingof_b(_object->handle(), child, TRUE, &child, &error) == DW_DLV_OK && child != nullptr);
+            } while(dwarf_siblingof_b(_object->handle(), child, 1, &child, &error) == DW_DLV_OK && child != nullptr);
         }
     }
 

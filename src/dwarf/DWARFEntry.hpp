@@ -38,17 +38,11 @@ namespace kstd {
     public:
         DWARFEntry() noexcept;
         DWARFEntry(DWARFObject* object, DWARFCompilationUnit* unit, Dwarf_Die_s* handle) noexcept;
-        KSTD_DEFAULT_MOVE(DWARFEntry, DWARFEntry)
+        DWARFEntry(DWARFEntry&& other) noexcept;
         KSTD_NO_COPY(DWARFEntry, DWARFEntry)
         ~DWARFEntry() noexcept;
 
-        [[nodiscard]] operator Dwarf_Die_s*() noexcept {
-            return _handle;
-        }
-
-        [[nodiscard]] operator const Dwarf_Die_s*() const noexcept {
-            return _handle;
-        }
+        auto operator=(DWARFEntry&& other) noexcept -> DWARFEntry&;
 
         [[nodiscard]] auto handle() noexcept -> Dwarf_Die_s* {
             return _handle;

@@ -42,14 +42,6 @@ namespace kstd {
         KSTD_NO_COPY(DWARFCompilationUnit, DWARFCompilationUnit)
         ~DWARFCompilationUnit() noexcept;
 
-        [[nodiscard]] operator Dwarf_Die_s*() noexcept {
-            return _handle;
-        }
-
-        [[nodiscard]] operator const Dwarf_Die_s*() const noexcept {
-            return _handle;
-        }
-
         [[nodiscard]] auto handle() noexcept -> Dwarf_Die_s* {
             return _handle;
         }

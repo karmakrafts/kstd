@@ -101,6 +101,11 @@ add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/libs/fmt")
 target_link_libraries(kstd PUBLIC fmt::fmt)
 target_link_libraries(kstd-static PUBLIC fmt::fmt)
 
+# Compile Time Regular Expression
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/libs/ctre")
+target_link_libraries(kstd PUBLIC ctre::ctre)
+target_link_libraries(kstd-static PUBLIC ctre::ctre)
+
 # Tests
 if (KSTD_BUILD_TESTS)
     add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/libs/googletest")
@@ -112,7 +117,7 @@ if (KSTD_BUILD_TESTS)
     gtest_discover_tests(kstd-tests)
 
     if (KSTD_COMPILER_GCC OR KSTD_COMPILER_CLANG)
-        target_compile_options(kstd-tests PRIVATE -g3 -gdwarf-5 -O0 -fno-inline -D_GLIBCXX_DEBUG_BACKTRACE)
+        target_compile_options(kstd-tests PRIVATE -g3 -gdwarf -O0 -fno-inline -D_GLIBCXX_DEBUG_BACKTRACE)
     endif ()
 
     if (KSTD_BUILD_DEBUG AND KSTD_COMPILER_MSVC)
@@ -123,8 +128,8 @@ endif ()
 # Enable debug options/definitions
 if (KSTD_BUILD_DEBUG)
     if (KSTD_COMPILER_GCC OR KSTD_COMPILER_CLANG)
-        target_compile_options(kstd PRIVATE -g3 -gdwarf-5 -O0 -fno-inline -D_GLIBCXX_DEBUG_BACKTRACE)
-        target_compile_options(kstd-static PRIVATE -g3 -gdwarf-5 -O0 -fno-inline -D_GLIBCXX_DEBUG_BACKTRACE)
+        target_compile_options(kstd PRIVATE -g3 -gdwarf -O0 -fno-inline -D_GLIBCXX_DEBUG_BACKTRACE)
+        target_compile_options(kstd-static PRIVATE -g3 -gdwarf -O0 -fno-inline -D_GLIBCXX_DEBUG_BACKTRACE)
     endif ()
     if (KSTD_COMPILER_MSVC)
         target_compile_definitions(kstd PRIVATE _ITERATOR_DEBUG_LEVEL=2) # Enable checked iterators

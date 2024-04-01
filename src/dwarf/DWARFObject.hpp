@@ -39,14 +39,6 @@ namespace kstd {
 
         auto operator=(DWARFObject&& other) noexcept -> DWARFObject&;
 
-        [[nodiscard]] operator Dwarf_Debug_s*() noexcept {
-            return _handle;
-        }
-
-        [[nodiscard]] operator const Dwarf_Debug_s*() const noexcept {
-            return _handle;
-        }
-
         [[nodiscard]] auto path() const noexcept -> const Path& {
             return _path;
         }

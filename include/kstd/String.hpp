@@ -16,12 +16,22 @@
 #include <fmt/format.h>
 
 #include "Concepts.hpp"
+#include "Allocator.hpp"
+#include "Defaults.hpp"
 
 namespace kstd {
-    template<concepts::Integer T>
+    template<concepts::Integer T, concepts::Allocator<T> TAllocator = Allocator<T>>
     struct BasicString final {
+        using value_type = T;
+        using allocator_type = TAllocator;
 
+    private:
+        using self_type = BasicString<T, TAllocator>;
     };
 
-    using String = std::string;
+    template<concepts::Allocator<char> TAllocator = Allocator<char>>
+    using String = BasicString<char, TAllocator>;
+
+    template<concepts::Allocator<wchar_t> TAllocator = Allocator<wchar_t>>
+    using WString = BasicString<wchar_t, TAllocator>;
 }// namespace kstd

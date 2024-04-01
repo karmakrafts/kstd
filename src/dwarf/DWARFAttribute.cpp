@@ -29,11 +29,26 @@ namespace kstd {
         , _handle(handle) {
     }
 
+    DWARFAttribute::DWARFAttribute(DWARFAttribute&& other) noexcept
+        : _object(other._object)
+        , _entry(other._entry)
+        , _handle(other._handle) {
+        other._handle = nullptr;
+    }
+
     DWARFAttribute::~DWARFAttribute() noexcept {
         if(_handle == nullptr) {
             return;
         }
         dwarf_dealloc_attribute(_handle);
+    }
+
+    auto DWARFAttribute::operator=(DWARFAttribute&& other) noexcept -> DWARFAttribute& {
+        _object = other._object;
+        _entry = other._entry;
+        _handle = other._handle;
+        other._handle = nullptr;
+        return *this;
     }
 
     template<>
@@ -44,7 +59,7 @@ namespace kstd {
             return {};
         }
         String result(data);
-        dwarf_dealloc(*_object, data, DW_DLA_STRING);
+        dwarf_dealloc(_object->handle(), data, DW_DLA_STRING);
         return result;
     }
 

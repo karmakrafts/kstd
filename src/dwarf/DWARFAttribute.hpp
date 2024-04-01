@@ -34,9 +34,11 @@ namespace kstd {
     public:
         DWARFAttribute() noexcept = default;
         DWARFAttribute(DWARFObject* object, DWARFEntry* entry, Dwarf_Attribute_s* handle) noexcept;
+        DWARFAttribute(DWARFAttribute&& other) noexcept;
         KSTD_NO_COPY(DWARFAttribute, DWARFAttribute)
-        KSTD_DEFAULT_MOVE(DWARFAttribute, DWARFAttribute)
         ~DWARFAttribute() noexcept;
+
+        auto operator=(DWARFAttribute&& other) noexcept -> DWARFAttribute&;
 
         template<typename T>
         [[nodiscard]] auto into() const noexcept -> T;
@@ -55,14 +57,6 @@ namespace kstd {
 
         [[nodiscard]] auto entry() const noexcept -> const DWARFEntry& {
             return *_entry;
-        }
-
-        [[nodiscard]] operator Dwarf_Attribute_s*() noexcept {
-            return _handle;
-        }
-
-        [[nodiscard]] operator const Dwarf_Attribute_s*() const noexcept {
-            return _handle;
         }
 
         [[nodiscard]] auto handle() noexcept -> Dwarf_Attribute_s* {

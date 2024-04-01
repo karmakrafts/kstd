@@ -37,11 +37,11 @@ namespace kstd {
         Dwarf_Sig8 cu_type_signature;
         Dwarf_Unsigned cu_type_offset;
         Dwarf_Half cu_header_type;
-        while(dwarf_next_cu_header_d(_handle, TRUE, &cu_header_length, &cu_header_version, &cu_abbrev_offset, &cu_address_size,
+        while(dwarf_next_cu_header_d(_handle, 1, &cu_header_length, &cu_header_version, &cu_abbrev_offset, &cu_address_size,
                                      &cu_length_size, &cu_extension_size, &cu_type_signature, &cu_type_offset, &cu_next_header_offset,
                                      &cu_header_type, &error) == DW_DLV_OK) {
             Dwarf_Die_s* unit = nullptr;
-            if(dwarf_siblingof_b(_handle, nullptr, TRUE, &unit, &error) != DW_DLV_OK || unit == nullptr) {
+            if(dwarf_siblingof_b(_handle, nullptr, 1, &unit, &error) != DW_DLV_OK || unit == nullptr) {
                 continue;
             }
             _units.emplace_back(this, unit);

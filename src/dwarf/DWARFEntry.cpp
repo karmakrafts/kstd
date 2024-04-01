@@ -15,7 +15,6 @@
 
 #include "DWARFEntry.hpp"
 
-#include <dwarf.h>
 #include <libdwarf.h>
 
 #include "DWARFObject.hpp"
@@ -25,6 +24,14 @@ namespace kstd {
         : _object(nullptr)
         , _unit(nullptr)
         , _handle(nullptr) {
+    }
+
+    DWARFEntry::DWARFEntry(DWARFEntry&& other) noexcept
+        : _object(other._object)
+        , _unit(other._unit)
+        , _handle(other._handle)
+        , _attributes(move(other._attributes)) {
+        other._handle = nullptr;
     }
 
     DWARFEntry::DWARFEntry(DWARFObject* object, DWARFCompilationUnit* unit, Dwarf_Die_s* handle) noexcept
@@ -45,6 +52,15 @@ namespace kstd {
             return;
         }
         dwarf_dealloc_die(_handle);
+    }
+
+    auto DWARFEntry::operator=(DWARFEntry&& other) noexcept -> DWARFEntry& {
+        _object = other._object;
+        _unit = other._unit;
+        _handle = other._handle;
+        _attributes = move(other._attributes);
+        other._handle = nullptr;
+        return *this;
     }
 }// namespace kstd
 

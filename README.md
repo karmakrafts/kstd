@@ -10,8 +10,9 @@ The library also provides various portable implementations of not-yet fully impl
 - **[P0122R7](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/p0122r7.pdf)**/kstd::Slice - bounds-safe views for sequences of
   objects
 - **[P1208R6](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2019/p1208r6.pdf)**/kstd::SourceLocation - Adopt source_location for C++20
-- **[P0645R10](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2019/p0645r10.html)**/kstd::String::format - Text Formatting with std::format (libfmt)
+- **[P0645R10](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2019/p0645r10.html)**/kstd::String::format - Text Formatting with std::format (using [fmt](https://github.com/fmtlib/fmt))
 - kstd::StackTrace - a portable interface for unwinding the stack and capturing a stack trace using debug symbols
+- [CTRE]() as the default RegEx implementation
 - [mimalloc](https://github.com/microsoft/mimalloc) as the global default memory allocator
 
 ## Requirements
